@@ -8,7 +8,7 @@ import com.spvp.WSDataAccess.WebService;
 
 
 @Controller
-public class HelloWorldKlasa {
+public class URLRuter {
 	
 	@RequestMapping("/welcome")
 	public ModelAndView helloWorld() {

@@ -1,2 +1,6 @@
 com\spvp\WSDataAccess\WebService.class
+com\spvp\model\Prognoza.class
+com\spvp\model\Grad.class
 com\spvp\controller\URLRuter.class
+com\spvp\network\NormForm.class
+com\spvp\network\NNetwork.class

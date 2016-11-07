@@ -13,175 +13,80 @@ import java.util.Date;
  */
 public class Prognoza {
     
-    private Date zaDatum;
-    private Grad zaGrad;
-    private double temperatura;
-    private double minTemperatura;
-    private double maxTemperatura;
-    private double vlaznostZraka;
-    private double pritisakZraka;
-    private double brzinaVjetra;
-    private double vidljivost;
+    private String zaGrad;
+    private String temperatura;
+    private String vlaznostZraka;
+    private String pritisakZraka;
+    private String brzinaVjetra;
     private String vrijeme;
-    private String kodDrzave;
+    private Date datum;
 
-    public Prognoza(Date zaDatum, Grad zaGrad, double temperatura, double minTemperatura, double maxTemperatura, double vlaznostZraka, double pritisakZraka, double brzinaVjetra, double vidljivost, String vrijeme, String kodDrzave) {
-        this.zaDatum = zaDatum;
+    public Prognoza(String zaGrad, String temperatura, String vlaznostZraka, String pritisakZraka, String brzinaVjetra, String vrijeme) {
         this.zaGrad = zaGrad;
         this.temperatura = temperatura;
-        this.minTemperatura = minTemperatura;
-        this.maxTemperatura = maxTemperatura;
         this.vlaznostZraka = vlaznostZraka;
         this.pritisakZraka = pritisakZraka;
         this.brzinaVjetra = brzinaVjetra;
-        this.vidljivost = vidljivost;
         this.vrijeme = vrijeme;
-        this.kodDrzave = kodDrzave;
-    }
-    
-    public String getKodDrzave() {
-        return kodDrzave;
-    }
-   
-    public void setKodDrzave(String kodDrzave) {
-        this.kodDrzave = kodDrzave;
     }
 
-    public Date getZaDatum() {
-        return zaDatum;
-    }
-
-    /**
-     * @param zaDatum the zaDatum to set
-     */
-    public void setZaDatum(Date zaDatum) {
-        this.zaDatum = zaDatum;
-    }
-
-    /**
-     * @return the zaGrad
-     */
-    public Grad getZaGrad() {
+    public String getZaGrad() {
         return zaGrad;
     }
 
-    /**
-     * @param zaGrad the zaGrad to set
-     */
-    public void setZaGrad(Grad zaGrad) {
+    public void setZaGrad(String zaGrad) {
         this.zaGrad = zaGrad;
     }
 
-    /**
-     * @return the temperatura
-     */
-    public double getTemperatura() {
+    public String getTemperatura() {
         return temperatura;
     }
 
-    /**
-     * @param temperatura the temperatura to set
-     */
-    public void setTemperatura(double temperatura) {
+    public void setTemperatura(String temperatura) {
         this.temperatura = temperatura;
     }
 
-    /**
-     * @return the minTemperatura
-     */
-    public double getMinTemperatura() {
-        return minTemperatura;
-    }
-
-    /**
-     * @param minTemperatura the minTemperatura to set
-     */
-    public void setMinTemperatura(double minTemperatura) {
-        this.minTemperatura = minTemperatura;
-    }
-
-    /**
-     * @return the maxTemperatura
-     */
-    public double getMaxTemperatura() {
-        return maxTemperatura;
-    }
-
-    /**
-     * @param maxTemperatura the maxTemperatura to set
-     */
-    public void setMaxTemperatura(double maxTemperatura) {
-        this.maxTemperatura = maxTemperatura;
-    }
-
-    /**
-     * @return the vlaznostZraka
-     */
-    public double getVlaznostZraka() {
+    public String getVlaznostZraka() {
         return vlaznostZraka;
     }
 
-    /**
-     * @param vlaznostZraka the vlaznostZraka to set
-     */
-    public void setVlaznostZraka(double vlaznostZraka) {
+    public void setVlaznostZraka(String vlaznostZraka) {
         this.vlaznostZraka = vlaznostZraka;
     }
 
-    /**
-     * @return the pritisakZraka
-     */
-    public double getPritisakZraka() {
+    public String getPritisakZraka() {
         return pritisakZraka;
     }
 
-    /**
-     * @param pritisakZraka the pritisakZraka to set
-     */
-    public void setPritisakZraka(double pritisakZraka) {
+    public void setPritisakZraka(String pritisakZraka) {
         this.pritisakZraka = pritisakZraka;
     }
 
-    /**
-     * @return the brzinaVjetra
-     */
-    public double getBrzinaVjetra() {
+    public String getBrzinaVjetra() {
         return brzinaVjetra;
     }
 
-    /**
-     * @param brzinaVjetra the brzinaVjetra to set
-     */
-    public void setBrzinaVjetra(double brzinaVjetra) {
+    public void setBrzinaVjetra(String brzinaVjetra) {
         this.brzinaVjetra = brzinaVjetra;
     }
 
-    /**
-     * @return the vidljivost
-     */
-    public double getVidljivost() {
-        return vidljivost;
-    }
-
-    /**
-     * @param vidljivost the vidljivost to set
-     */
-    public void setVidljivost(double vidljivost) {
-        this.vidljivost = vidljivost;
-    }
-
-    /**
-     * @return the vrijeme
-     */
     public String getVrijeme() {
         return vrijeme;
     }
 
-    /**
-     * @param vrijeme the vrijeme to set
-     */
     public void setVrijeme(String vrijeme) {
         this.vrijeme = vrijeme;
     }
+
+    public Date getDatum() {
+        return datum;
+    }
+
+    public void setDatum(Date datum) {
+        this.datum = datum;
+    }
+    
+    
+    
 
 }

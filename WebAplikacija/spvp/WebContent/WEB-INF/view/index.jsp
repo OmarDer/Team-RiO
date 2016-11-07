@@ -1,3 +1,6 @@
+<%@ page import="com.spvp.model.Prognoza" %>
+<%@ page import="java.util.Date" %>
+<% Prognoza prog = (Prognoza)  request.getAttribute("prognoza"); %>
 <!DOCTYPE html>
 <html>
 
@@ -53,7 +56,78 @@
 
                 </div>
 
-                ${vrijeme}             
+                <%!  String pisiZaDatum(Prognoza prog)
+                    {
+                        if(prog != null)
+                        {
+                            return new Date().toString();
+                        } 
+                        else
+                            return "";
+                    }
+                %>
+
+                <%!  String pisiZaGrad(Prognoza prog)
+                    {
+                        if(prog != null)
+                        {
+                            return prog.getZaGrad();
+                        } 
+                        else
+                            return "";
+                    }
+                %>
+
+                <%!  String ispisiVrijeme(Prognoza prog)
+                    {
+                        if(prog != null)
+                        {
+                            
+                            String vrijeme = "<p>Vrijeme: " + prog.getVrijeme() + "</p>";
+                                   vrijeme += "<p>Temperatura: " + prog.getTemperatura() + "&deg;C</p>";
+                                    vrijeme +=  "<p>Pritisak zraka: " + prog.getPritisakZraka() + " hPa</p>";
+                                    vrijeme +=  "<p>Vlaznost zraka: " + prog.getVlaznostZraka() + " %</p>";
+                                    vrijeme +=  "<p>Brzina vjetra: " + prog.getBrzinaVjetra() + " km/h</p>";
+
+                            return vrijeme;
+                        } 
+                        else
+                            return "";
+                    }
+                %>
+
+                <%!  String dajURLIkone(Prognoza prog)
+                    {
+                        if(prog != null)
+                        {
+                            return "";
+                        } 
+                        else
+                            return "";
+                    }
+                %>
+
+                <div class="row topmargin">
+                    <div class="col-lg-12">
+                        <p>Prikaz vremena za <%= pisiZaGrad(prog) %>, Bosna i Hercegovina <%= pisiZaDatum(prog) %></p>
+                    </div>
+
+                </div>
+
+                <div class="row topmargin">
+
+                    <div class="col-lg-3">
+                        <img src='resources/images/clear.jpg'>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <%= ispisiVrijeme(prog) %>          
+                    </div>
+
+                </div>
+
+                
+            
             </div>
 
         	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>

@@ -19,6 +19,7 @@ public class Prognoza {
     private String pritisakZraka;
     private String brzinaVjetra;
     private String vrijeme;
+    private String weatherIcon;
     private Date datum;
 
     public Prognoza(String zaGrad, String temperatura, String vlaznostZraka, String pritisakZraka, String brzinaVjetra, String vrijeme) {
@@ -30,6 +31,15 @@ public class Prognoza {
         this.vrijeme = vrijeme;
     }
 
+    public String getWeatherIcon() {
+        return weatherIcon;
+    }
+
+    public void setWeatherIcon(String weatherIcon) {
+        this.weatherIcon = weatherIcon;
+    }
+    
+    
     public String getZaGrad() {
         return zaGrad;
     }

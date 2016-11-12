@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
  */
 public class LocationService {
     
-    public static Location getLocationForIP()
+    public static Location getClientLocation()
     {
        RestTemplate restTemplate = new RestTemplate();
        String result = restTemplate.getForObject("http://ip-api.com/json", String.class);

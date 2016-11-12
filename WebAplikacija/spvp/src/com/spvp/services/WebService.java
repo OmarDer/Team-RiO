@@ -50,7 +50,11 @@ public class WebService {
             String brzinaVjetra = trenutnoStanje.getString("windspeedKmph");       
             String vrijeme = trenutnoStanje.getJSONArray("weatherDesc").getJSONObject(0).getString("value");
             
-            return new Prognoza(gradName ,temp, vlaznostZraka, pritisak, brzinaVjetra, vrijeme);         
+            Prognoza prog = new Prognoza(gradName ,temp, vlaznostZraka, pritisak, brzinaVjetra, vrijeme);
+            
+            prog.setWeatherIcon(getWeatherIcon(prog));
+            
+            return prog;
         }
 	
         private ArrayList<Prognoza> parsirajJSONObjectUListu(JSONObject json, long brDana) throws ParseException
@@ -91,6 +95,8 @@ public class WebService {
                 vrijeme = vrijemeZaDan.getJSONArray("weatherDesc").getJSONObject(0).getString("value");
                 
                 prog = new Prognoza(gradName ,temp, vlaznostZraka, pritisak, brzinaVjetra, vrijeme);
+            
+                prog.setWeatherIcon(getWeatherIcon(prog));
                 
                 prog.setDatum(datum);
                 
@@ -112,8 +118,17 @@ public class WebService {
             return parsirajJSONObject(new JSONObject(result));
         }
         
-        public ArrayList<Prognoza> getHistorijskePodatkeByLocation(Location lokacija, Date start, Date end) throws ParseException
+        public ArrayList<Prognoza> getHistorijskePodatkeByLocation(Location lokacija, int brZadnjihDana) throws ParseException
         {
+            Date end = new Date();
+            long x = brZadnjihDana * 24 * 3600 * 1000;
+            Date start = new Date(end.getTime() - x );
+            
+            if(start.getMonth() != end.getMonth()){
+                start = new Date();
+                start.setDate(1);
+            }
+            
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
             String startDate = df.format(start);
             String endDate = df.format(end);
@@ -127,4 +142,30 @@ public class WebService {
             
             return parsirajJSONObjectUListu(new JSONObject(result), brDana);
         }
+        
+        private String getWeatherIcon(Prognoza p){
+        
+            String vrijeme = p.getVrijeme().toLowerCase();
+
+            if(vrijeme.contains("sunny")){
+                return "resources/images/sunny.jpg";
+            }
+            else if(vrijeme.contains("rain")){
+                return "resources/images/rain.jpg";
+            }
+            else if(vrijeme.contains("snow")){
+                return "resources/images/snow.jpg";
+            }
+            else if(vrijeme.contains("cloudy") || vrijeme.contains("overcast")){
+                return "resources/images/clouds.jpg";
+            }
+            else if(vrijeme.contains("light drizzle")){
+                return "resources/images/rain.jpg";
+            }
+            else if(vrijeme.contains("fog") || vrijeme.contains("mist")){
+                return "resources/images/fog.jpg";
+            }
+            return "";
+        
+        }   
 }

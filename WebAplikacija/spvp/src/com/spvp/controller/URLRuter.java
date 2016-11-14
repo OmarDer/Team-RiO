@@ -40,7 +40,7 @@ public class URLRuter {
 		
 		WebService weather = new WebService("http://api.worldweatheronline.com/premium/v1/past-weather.ashx", "c868e1f7b5a24e97a44211932160711");
              
-                return new ModelAndView("proba", "prognoza", weather.getHistorijskePodatkeByLocation(LocationService.getClientLocation(), 20));
+                return new ModelAndView("proba", "prognoza", weather.getHistorijskePodatkeByLocation(LocationService.getClientLocation(), 12));
 	}
 
 }

@@ -120,8 +120,10 @@ public class WebService {
         
         public ArrayList<Prognoza> getHistorijskePodatkeByLocation(Location lokacija, int brZadnjihDana) throws ParseException
         {
-            Date end = new Date();
-            long x = brZadnjihDana * 24 * 3600 * 1000;
+            Date danasnji = new Date();
+            long x = 24 * 3600 * 1000;
+            Date end = new Date(danasnji.getTime() - x );
+            x = brZadnjihDana * 24 * 3600 * 1000;
             Date start = new Date(end.getTime() - x );
             
             if(start.getMonth() != end.getMonth()){
@@ -135,11 +137,10 @@ public class WebService {
             
             long diff = end.getTime() - start.getTime();
             long brDana = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-  
+
             String countryCode = lokacija.getCountryCode().toLowerCase();
             String result = getRestTemplate().getForObject(this.basicUrl + "?q=" + lokacija.getCity() + ","+ countryCode +"&key=" + apiKey + "&date="+startDate+"&enddate="+endDate+"&tp=24&includelocation=yes&format=json", String.class);
-            
-            
+
             return parsirajJSONObjectUListu(new JSONObject(result), brDana);
         }
         
@@ -167,5 +168,6 @@ public class WebService {
             }
             return "";
         
-        }   
+        }
+       
 }

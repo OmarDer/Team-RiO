@@ -32,7 +32,7 @@ public class NNetwork {
 	private double outputArgs[][];
 	private BasicNetwork network;
 	private MLDataSet trainingSet;
-        private MLDataSet testSet;
+        //private MLDataSet testSet;
         private double trError;
         private double maxT;
         private double minT;
@@ -42,14 +42,14 @@ public class NNetwork {
         private double minBv;
         private int velProblema;
 	
-	public NNetwork(ArrayList<Prognoza>prognoze){
+	public NNetwork(){
 	
-                double inputArg[][]=formatirajUlaznePodatke(prognoze);
-                double outputArg[][]=formatirajIzlaznePodatke(prognoze);
-		inputArgs=inputArg;
-		outputArgs=outputArg;
+                //double inputArg[][]=formatirajUlaznePodatke(prognoze);
+                //double outputArg[][]=formatirajIzlaznePodatke(prognoze);
+		//inputArgs=inputArg;
+		//outputArgs=outputArg;
 		network = new BasicNetwork();
-		trainingSet=new BasicMLDataSet(inputArgs,outputArgs);
+		//trainingSet=new BasicMLDataSet(inputArgs,outputArgs);
                 
                 trError=0.0;
                 maxT=0.0;
@@ -58,10 +58,10 @@ public class NNetwork {
                 minV=0.0;
                 maxBv=0.0;
                 minBv=0.0;
-                velProblema=prognoze.size();
+                //velProblema=prognoze.size();
 	}
         
-        private double [][] formatirajUlaznePodatke(ArrayList<Prognoza>prognoze)
+        private void formatirajUlaznePodatke(ArrayList<Prognoza>prognoze)
         {
             int m=prognoze.size()-1;
             int n=7;
@@ -105,9 +105,12 @@ public class NNetwork {
                 System.out.printf("%n");
             }
             */
-            return input;
+            velProblema=prognoze.size();
+            inputArgs=input;
+            //return input;
         }
-        private double [][] formatirajIzlaznePodatke(ArrayList<Prognoza>prognoze)
+        
+        private void formatirajIzlaznePodatke(ArrayList<Prognoza>prognoze)
         {
             int m=prognoze.size()-1;
             int n=5;
@@ -149,7 +152,8 @@ public class NNetwork {
                 System.out.printf("%n");
             }
             */
-            return output;
+            outputArgs=output;
+            //return output;
             
         }
         public void pripremiPodatke()
@@ -228,52 +232,53 @@ public class NNetwork {
             int br=0;
             for (int i=1;i<5;i++)
             {
-                if(Math.abs(lista[i]-1.0)<0.0001)
+                if(Math.abs(lista[i]-1.0)<0.00001)
                 {
                     br++;
                 }
             }
-            
+           if(br==1)
+           {
+               //System.out.println("poz1");
+               return lista;
+           }
            int poz=0;
            double max=0.0;
-           
+           double []oblacno=NormForm.vratiKolonu(outputArgs, 1);
+           double []suncano=NormForm.vratiKolonu(outputArgs, 2);
+           double []snijeg=NormForm.vratiKolonu(outputArgs, 3);
+           double []kisa=NormForm.vratiKolonu(outputArgs, 4);
+                
+           double []novaLista=new double[4];
+           novaLista[0]=NormForm.Prosjek(oblacno, velProblema-1);
+           novaLista[1]=NormForm.Prosjek(oblacno, velProblema-1);
+           novaLista[2]=NormForm.Prosjek(oblacno, velProblema-1);
+           novaLista[3]=NormForm.Prosjek(oblacno, velProblema-1);
+                
+                
+                
+           for(int i=0;i<4;i++)
+            {
+                if(max<novaLista[i])
+                 {
+                   max=novaLista[i];
+                   poz=i;
+                 }
+           }
+                
+           poz++;
             if(br>1)
             {
-                double []oblacno=NormForm.vratiKolonu(outputArgs, 1);
-                double []suncano=NormForm.vratiKolonu(outputArgs, 2);
-                double []snijeg=NormForm.vratiKolonu(outputArgs, 3);
-                double []kisa=NormForm.vratiKolonu(outputArgs, 4);
-                
-                double []novaLista=new double[4];
-                novaLista[0]=NormForm.Prosjek(oblacno, velProblema-1);
-                novaLista[1]=NormForm.Prosjek(oblacno, velProblema-1);
-                novaLista[2]=NormForm.Prosjek(oblacno, velProblema-1);
-                novaLista[3]=NormForm.Prosjek(oblacno, velProblema-1);
-                
-                
-                
-                for(int i=0;i<4;i++)
-                {
-                    if(max<novaLista[i])
-                    {
-                        max=novaLista[i];
-                        poz=i;
-                    }
-                }
-                
-                poz++;
-                
+                //System.out.println("poz");
                 for(int i=1;i<5;i++)
                 {
                     lista[i]=0.0;
                 }
-                lista[poz]=1.0;
+                
                 
             }
-            else if(br==0)
-            {
-                lista[poz]=1.0;
-            }
+            lista[poz]=1.0; 
+            
             return lista;
         }
         
@@ -331,31 +336,36 @@ public class NNetwork {
             
             return provjeriJedinice(rjesenje);
         }
-        /*
-	public static void main( String[] args ) throws ParseException
+        public double[] weatherForecast() throws ParseException 
         {
                 Location l=LocationService.getClientLocation();
                 WebService ws=new WebService("http://api.worldweatheronline.com/premium/v1/past-weather.ashx", "c868e1f7b5a24e97a44211932160711");
                 ArrayList<Prognoza> prognoze=ws.getHistorijskePodatkeByLocation(l, 12);
                 
-                //ArrayList<Prognoza> prognozeTest=ws.getHistorijskePodatkeByLocation(l, 12);
-                NNetwork mreza=new NNetwork(prognoze);
-                mreza.pripremiPodatke();
-                mreza.kreirajMrezu();
-                mreza.trenirajMrezu();
-                //mreza.trenirajMrezu();
+                formatirajUlaznePodatke(prognoze);
+                formatirajIzlaznePodatke(prognoze);
+                
+                pripremiPodatke();
+                kreirajMrezu();
+                trenirajMrezu();
+                
                 int si=prognoze.size()-1;
-                
+                double []rezultati=testirajMrezicu(prognoze.get(si));
+                return rezultati;
+        }
+        
+	public static void main( String[] args ) throws ParseException
+        {   
+                NNetwork nn=new NNetwork();
                 double []rezultati=new double[5];
-                rezultati=mreza.testirajMrezicu(prognoze.get(si));
-                
+                rezultati=nn.weatherForecast();
                 for(int i=0;i<5;i++)
                 {
                     System.out.print(rezultati[i]+" ");
                 }
 
         }
-        */
+        
 	
 	
 	

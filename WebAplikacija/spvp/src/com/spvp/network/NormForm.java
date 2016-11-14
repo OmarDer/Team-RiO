@@ -97,41 +97,4 @@ public class NormForm {
         return suma/vel;
     }
     
-   /* 
-    public static void main( String[] args )
-    {
-      NormForm norm=new NormForm();
-        double[] lista={2,1,1,3,4,2,1};
-        double[] nLista=normaliziraj(lista);
-       
-        for (int i=0;i<nLista.length;i++)
-        {
-            System.out.println(nLista[i]);
-        }
-        double min=NormForm.nadjiMinimum(lista);
-        double max=NormForm.nadjiMaximum(lista);
-        
-        double []listaN=new double[lista.length];
-        for(int i=0;i<nLista.length;i++)
-        {
-            listaN[i]=NormForm.denormaliziraj(nLista[i], max, min);
-        }
-        
-        for (int i=0;i<nLista.length;i++)
-        {
-            System.out.println(listaN[i]);
-        }
-        
-        //double matrica[][]={{21.5,1},{23,2},{25,3},{25.48,4},{25,5},{27.7,7}};
-        //double[] lista=NormForm.vratiKolonu(matrica, 0);
-        //double[] nLista=normaliziraj(lista);
-        //for (int i=0;i<nLista.length;i++)
-        //{
-        //    System.out.println(nLista[i]);
-        //}
-        
-        //System.out.println(matrica);
-     
-    }
-    */
 }

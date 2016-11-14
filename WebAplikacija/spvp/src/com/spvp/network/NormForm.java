@@ -67,6 +67,12 @@ public class NormForm {
         }
         return normLista;
     }
+    public static double normaliziraj(double val,double max, double min)
+    {
+                
+      return ((val-min)/(max-min));
+      
+    }
     public static double denormaliziraj(double value,double max,double min)
     {     
         return ((max-min)*value+min);
@@ -76,16 +82,25 @@ public class NormForm {
     {   double []kolona= new double[matrica.length];
         for(int i=0;i<matrica.length;i++ )
         {
-            kolona[i]=matrica[i][0];
+            kolona[i]=matrica[i][index];
         }
         return kolona;
     }
     
+    public static double Prosjek(double []lista,int vel)
+    {
+        double suma=0.0;
+        for (int i=0;i<vel;i++)
+        {
+            suma=suma+lista[i];
+        }
+        return suma/vel;
+    }
     
-    
+   /* 
     public static void main( String[] args )
     {
-     /* NormForm norm=new NormForm();
+      NormForm norm=new NormForm();
         double[] lista={2,1,1,3,4,2,1};
         double[] nLista=normaliziraj(lista);
        
@@ -116,6 +131,7 @@ public class NormForm {
         //}
         
         //System.out.println(matrica);
-     */
+     
     }
+    */
 }

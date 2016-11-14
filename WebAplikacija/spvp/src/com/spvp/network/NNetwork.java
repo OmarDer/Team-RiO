@@ -43,14 +43,7 @@ public class NNetwork {
         private int velProblema;
 	
 	public NNetwork(){
-	
-                //double inputArg[][]=formatirajUlaznePodatke(prognoze);
-                //double outputArg[][]=formatirajIzlaznePodatke(prognoze);
-		//inputArgs=inputArg;
-		//outputArgs=outputArg;
 		network = new BasicNetwork();
-		//trainingSet=new BasicMLDataSet(inputArgs,outputArgs);
-                
                 trError=0.0;
                 maxT=0.0;
                 minT=0.0;
@@ -58,7 +51,6 @@ public class NNetwork {
                 minV=0.0;
                 maxBv=0.0;
                 minBv=0.0;
-                //velProblema=prognoze.size();
 	}
         
         private void formatirajUlaznePodatke(ArrayList<Prognoza>prognoze)
@@ -106,6 +98,7 @@ public class NNetwork {
             }
             */
             velProblema=prognoze.size();
+            
             inputArgs=input;
             //return input;
         }
@@ -115,7 +108,7 @@ public class NNetwork {
             int m=prognoze.size()-1;
             int n=5;
             double [][]output=new double [m][n];
-            for (int i=0;i<m;i++)           //Do jucerasnjeg dana
+            for (int i=0;i<m;i++)                                                   //Do jucerasnjeg dana
             {
                 
                 output[i][0]=Double.parseDouble(prognoze.get(i+1).getTemperatura());
@@ -239,7 +232,6 @@ public class NNetwork {
             }
            if(br==1)
            {
-               //System.out.println("poz1");
                return lista;
            }
            int poz=0;
@@ -254,9 +246,7 @@ public class NNetwork {
            novaLista[1]=NormForm.Prosjek(oblacno, velProblema-1);
            novaLista[2]=NormForm.Prosjek(oblacno, velProblema-1);
            novaLista[3]=NormForm.Prosjek(oblacno, velProblema-1);
-                
-                
-                
+      
            for(int i=0;i<4;i++)
             {
                 if(max<novaLista[i])
@@ -269,20 +259,42 @@ public class NNetwork {
            poz++;
             if(br>1)
             {
-                //System.out.println("poz");
                 for(int i=1;i<5;i++)
                 {
                     lista[i]=0.0;
                 }
-                
-                
+    
             }
             lista[poz]=1.0; 
             
             return lista;
         }
         
-        public double [] testirajMrezicu(Prognoza p)
+        public double [] testirajMrezicu(double[][]niz)
+        {
+            MLDataSet ml=new BasicMLDataSet(niz,niz);
+            MLData m=ml.get(0).getInput();
+            
+            final MLData output=network.compute(m);
+               
+            //System.out.println("actual=" + Math.round(NormForm.denormaliziraj(output.getData(0),maxT,minT))+" "+Math.round(output.getData(1))+" "+Math.round(output.getData(2))+" "+Math.round(output.getData(3))+" "+Math.round(output.getData(4)));
+               
+            Encog.getInstance().shutdown();
+            
+            double [] rjesenje=new double[5];
+            //System.out.print(Math.round(NormForm.denormaliziraj(m.getData(0),maxT,minT))+" "+Math.round(NormForm.denormaliziraj(m.getData(1),maxV,minV))+" "+Math.round(NormForm.denormaliziraj(m.getData(2),maxBv,minBv))+" "+m.getData(3)+" "+m.getData(4)+" "+m.getData(5)+" "+m.getData(6));
+            
+            rjesenje[0]=Math.round(NormForm.denormaliziraj(output.getData(0),maxT,minT));
+            rjesenje[1]=Math.round(output.getData(1));
+            rjesenje[2]=Math.round(output.getData(2));
+            rjesenje[3]=Math.round(output.getData(3));
+            rjesenje[4]=Math.round(output.getData(4));
+            
+            
+            return provjeriJedinice(rjesenje);
+        }
+        
+        private double[][] prilagodi(Prognoza p)
         {
             double[][] niz=new double[1][7];
             niz[0][0]=Double.parseDouble(p.getTemperatura());
@@ -310,33 +322,34 @@ public class NNetwork {
             {
                 niz[0][3]=1.0; 
             }
- 
+            return niz;
+        }
+        
+        private double[][] normNiz(double[][]niz)
+        {
             niz[0][0]=NormForm.normaliziraj(niz[0][0],maxT,minT);
             niz[0][1]=NormForm.normaliziraj(niz[0][1],maxV,minV);
             niz[0][2]=NormForm.normaliziraj(niz[0][2],maxBv,minBv);
-            
-            MLDataSet ml=new BasicMLDataSet(niz,niz);
-            MLData m=ml.get(0).getInput();
-            
-            final MLData output=network.compute(m);
-               
-            //System.out.println("actual=" + Math.round(NormForm.denormaliziraj(output.getData(0),maxT,minT))+" "+Math.round(output.getData(1))+" "+Math.round(output.getData(2))+" "+Math.round(output.getData(3))+" "+Math.round(output.getData(4)));
-               
-            Encog.getInstance().shutdown();
-            
-            double [] rjesenje=new double[5];
-            //System.out.print(Math.round(NormForm.denormaliziraj(m.getData(0),maxT,minT))+" "+Math.round(NormForm.denormaliziraj(m.getData(1),maxV,minV))+" "+Math.round(NormForm.denormaliziraj(m.getData(2),maxBv,minBv))+" "+m.getData(3)+" "+m.getData(4)+" "+m.getData(5)+" "+m.getData(6));
-            
-            rjesenje[0]=Math.round(NormForm.denormaliziraj(output.getData(0),maxT,minT));
-            rjesenje[1]=Math.round(output.getData(1));
-            rjesenje[2]=Math.round(output.getData(2));
-            rjesenje[3]=Math.round(output.getData(3));
-            rjesenje[4]=Math.round(output.getData(4));
-            
-            
-            return provjeriJedinice(rjesenje);
+            return niz;
         }
-        public double[] weatherForecast() throws ParseException 
+        
+        private double[][] dajNoviUlaz(double []niz)
+        {
+           double[][] ulaz=new double[1][7];
+           ulaz[0][0]=NormForm.normaliziraj(niz[0],maxT,minT);
+           ulaz[0][3]=niz[1];
+           ulaz[0][4]=niz[2];
+           ulaz[0][5]=niz[3];
+           ulaz[0][6]=niz[4];
+           double []vlaga=NormForm.vratiKolonu(inputArgs, 1);
+           double []vjetar=NormForm.vratiKolonu(inputArgs, 2);
+           ulaz[0][1]=NormForm.Prosjek(vlaga, velProblema-1);
+           ulaz[0][2]=NormForm.Prosjek(vjetar,velProblema-1);
+           
+           return ulaz;
+       }
+       
+        public double[][] weatherForecast() throws ParseException 
         {
                 Location l=LocationService.getClientLocation();
                 WebService ws=new WebService("http://api.worldweatheronline.com/premium/v1/past-weather.ashx", "c868e1f7b5a24e97a44211932160711");
@@ -350,18 +363,47 @@ public class NNetwork {
                 trenirajMrezu();
                 
                 int si=prognoze.size()-1;
-                double []rezultati=testirajMrezicu(prognoze.get(si));
-                return rezultati;
+                double [][]ulaz=prilagodi(prognoze.get(si));
+                
+                ulaz=normNiz(ulaz);
+                double []rezultati=testirajMrezicu(ulaz);       //Predvidjanje za jedan dan
+                
+                ulaz=dajNoviUlaz(rezultati);
+                double []rezultati2=testirajMrezicu(ulaz);      //Predvidjanje za dva dana
+                
+                ulaz=dajNoviUlaz(rezultati2);
+                double[]rezultati3=testirajMrezicu(ulaz);        //Previdjanje za tri dana
+                
+                double [][]vrijeme=new double [3][5];
+                for(int i=0;i<5;i++)
+                {
+                    vrijeme[0][i]=rezultati[i];
+                }
+                for(int i=0;i<5;i++)
+                {
+                    vrijeme[1][i]=rezultati2[i];
+                }
+                for(int i=0;i<5;i++)
+                {
+                    vrijeme[2][i]=rezultati3[i];
+                }
+                
+                return vrijeme;
+                
         }
-        
+       
 	public static void main( String[] args ) throws ParseException
         {   
                 NNetwork nn=new NNetwork();
-                double []rezultati=new double[5];
+                double [][]rezultati=new double[3][5];
                 rezultati=nn.weatherForecast();
-                for(int i=0;i<5;i++)
+                for(int i=0;i<3;i++)
                 {
-                    System.out.print(rezultati[i]+" ");
+                    for(int j=0;j<5;j++)
+                    {
+                       System.out.print(rezultati[i][j]+" "); 
+                    }
+                    System.out.printf("%n");
                 }
 
         }

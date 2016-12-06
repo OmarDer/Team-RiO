@@ -52,8 +52,6 @@ public class WebService {
             
             Prognoza prog = new Prognoza(gradName ,temp, vlaznostZraka, pritisak, brzinaVjetra, vrijeme);
             
-            prog.setWeatherIcon(getWeatherIcon(prog));
-            
             return prog;
         }
 	
@@ -95,8 +93,6 @@ public class WebService {
                 vrijeme = vrijemeZaDan.getJSONArray("weatherDesc").getJSONObject(0).getString("value");
                 
                 prog = new Prognoza(gradName ,temp, vlaznostZraka, pritisak, brzinaVjetra, vrijeme);
-            
-                prog.setWeatherIcon(getWeatherIcon(prog));
                 
                 prog.setDatum(datum);
                 
@@ -142,32 +138,6 @@ public class WebService {
             String result = getRestTemplate().getForObject(this.basicUrl + "?q=" + lokacija.getCity() + ","+ countryCode +"&key=" + apiKey + "&date="+startDate+"&enddate="+endDate+"&tp=24&includelocation=yes&format=json", String.class);
 
             return parsirajJSONObjectUListu(new JSONObject(result), brDana);
-        }
-        
-        private String getWeatherIcon(Prognoza p){
-        
-            String vrijeme = p.getVrijeme().toLowerCase();
-
-            if(vrijeme.contains("sunny")){
-                return "resources/images/sunny.jpg";
-            }
-            else if(vrijeme.contains("rain")){
-                return "resources/images/rain.jpg";
-            }
-            else if(vrijeme.contains("snow")){
-                return "resources/images/snow.jpg";
-            }
-            else if(vrijeme.contains("cloudy") || vrijeme.contains("overcast")){
-                return "resources/images/clouds.jpg";
-            }
-            else if(vrijeme.contains("light drizzle")){
-                return "resources/images/rain.jpg";
-            }
-            else if(vrijeme.contains("fog") || vrijeme.contains("mist")){
-                return "resources/images/fog.jpg";
-            }
-            return "";
-        
         }
        
 }

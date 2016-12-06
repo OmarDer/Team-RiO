@@ -1,6 +1,9 @@
 <%@ page import="com.spvp.model.Prognoza" %>
 <%@ page import="java.util.Date" %>
-<% Prognoza prog = (Prognoza)  request.getAttribute("prognoza"); %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.TimeZone" %>
+<%@ page import="java.util.ArrayList" %>
+<% ArrayList prog = (ArrayList) request.getAttribute("prognoza"); %>
 <%!  String pisiZaDatum(Prognoza prog)
     {
         if(prog != null)
@@ -9,6 +12,28 @@
         } 
         else
             return "";
+    }
+%>
+
+<%!  String vratiDan(int brojDanaUnaprijed)
+    {
+       Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+
+       calendar.add(Calendar.DATE, brojDanaUnaprijed);
+
+       int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+
+       switch(dayOfWeek){
+        case 1: return "Ponedjeljak";
+        case 2: return "Utorak";
+        case 3: return "Srijeda";
+        case 4: return "Cetvrtak";
+        case 5: return "Petak";
+        case 6: return "Subota";
+        case 7: return "Nedjelja";
+       }
+
+       return "";
     }
 %>
 
@@ -30,9 +55,6 @@
             
             String vrijeme = "<p>Vrijeme: " + prog.getVrijeme() + "</p>";
                    vrijeme += "<p>Temperatura: " + prog.getTemperatura() + "&deg;C</p>";
-                    vrijeme +=  "<p>Pritisak zraka: " + prog.getPritisakZraka() + " hPa</p>";
-                    vrijeme +=  "<p>Vlaznost zraka: " + prog.getVlaznostZraka() + " %</p>";
-                    vrijeme +=  "<p>Brzina vjetra: " + prog.getBrzinaVjetra() + " km/h</p>";
 
             return vrijeme;
         } 
@@ -57,7 +79,7 @@
 
         <meta charset="UTF-8">
 
-        <title>Weather Forecasting By Omar And Ragib</title>
+        <title>Weather Forecast In Next 3 Days By Omar And Ragib</title>
 
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -92,14 +114,14 @@
                     <!-- Collect the nav links, forms, and other content for toggling -->
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                       <ul class="nav navbar-nav">
-                        <li class="active"><a href="/spvp">Vrijeme danas</a></li>
-                        <li><a href="/spvp/narednatridana">Vrijeme naredna tri dana</a></li>
+                        <li><a href="/spvp">Vrijeme danas</a></li>
+                        <li class="active"><a href="/spvp/narednatridana">Vrijeme naredna tri dana</a></li>
                         <li><a href="#">Vrijeme u BiH</a></li>
                         <li><a href="#">Vrijeme naredna tri dana u BiH</a></li>
                       </ul>
-                      <form id="navForm" class="form-inline navbar-form navbar-right">
+                      <form id="navFormNaredniDani" class="form-inline navbar-form navbar-right">
                         <div class="form-group">
-                          <input id="navInputField" type="text" name="city" class="form-control" placeholder="Unesite naziv grada" />
+                          <input id="navInputFieldNaredniDani" type="text" name="city" class="form-control" placeholder="Unesite naziv grada" />
                         </div>
                         <button type="submit" class="btn btn-default">Trazi</button>
                       </form>
@@ -119,44 +141,79 @@
 
                     <div class="row centered topmargin">
                         
-                            <h3 class="headerText">Welcome! Weather forecasting by Omar and Ragib!</h3>
+                            <h3 class="headerText">Weather forecast in next 3 days by Omar and Ragib!</h3>
                         
                     </div>
 
                     <div class="row">
                         <div class="col-lg-12 centered">
-                            <form id="mainForm" class="form-inline">
-                                <input id="mainInputField" type="text" class="form-control cityInput" placeholder="Unesite naziv grada" />
+                            <form id="mainFormNaredniDani" class="form-inline">
+                                <input id="mainInputFieldNaredniDani" type="text" class="form-control cityInput" placeholder="Unesite naziv grada" />
                                 <button class="btn btn-default">Trazi</button> 
                             </form>
                         </div>
 
                     </div>
 
+                    
                     <div class="row weathermargin robotoSlab">
                         <div class="col-lg-12">
-                            <p><span id="vrijemeZaGrad"><%= pisiZaGrad(prog) %></span>, Bosna i Hercegovina <%= pisiZaDatum(prog) %></p>
+                            <p><span id="vrijemeZaGrad"><%= pisiZaGrad((Prognoza)prog.get(0)) %></span>, Bosna i Hercegovina <%= pisiZaDatum((Prognoza)prog.get(0)) %></p>
                         </div>
 
                     </div>
 
                     <div class="row robotoSlab">
 
-                        <div class="col-lg-2">
-                            <img id="weatherImage" src='<%= dajURLIkone(prog) %>'>
+                        <div class="col-lg-4">
+                            <div class="row centered">
+                                <h3 class="centered">Sutra</h3>
+                            </div>
+                            <img id="weatherImageDan1" src='<%= dajURLIkone((Prognoza)prog.get(0)) %>'>
+
+                            <div id="izvjestajOVremenuDan1" class="col-lg-3 weathermargin">
+                                <%= ispisiVrijeme((Prognoza)prog.get(0)) %>          
+                            </div>
                         </div>
 
-                        <div id="izvjestajOVremenu" class="col-lg-3 weathermargin">
-                            <%= ispisiVrijeme(prog) %>          
-                        </div>
+                        <div class="col-lg-4">
+                            <div class="row centered">
+                                <h3 class="centered"><%= vratiDan(1) %></h3>
+                            </div>
+                            <img id="weatherImageDan2" src='<%= dajURLIkone((Prognoza)prog.get(1)) %>'>
 
-                        <div class="col-lg-1">
-                            
-                        </div>
-
-                        <div id="map" class="col-lg-6">
+                            <div id="izvjestajOVremenuDan2" class="col-lg-3 weathermargin">
+                                <%= ispisiVrijeme((Prognoza)prog.get(1)) %>          
+                            </div>
                         
                         </div>
+
+                        <div class="col-lg-4">
+                            <div class="row centered">
+                                <h3 class="centered"><%= vratiDan(2) %></h3>
+                            </div>
+                            <img id="weatherImageDan3" src='<%= dajURLIkone((Prognoza)prog.get(2)) %>'>
+
+
+                            <div id="izvjestajOVremenuDan3" class="col-lg-3 weathermargin">
+                                <%= ispisiVrijeme((Prognoza)prog.get(2)) %>          
+                            </div>
+                        
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-lg-3">
+                        
+                        </div>
+
+                        <div id="map" class="col-lg-8">
+                        
+                        </div>
+
+                
 
                     </div>
                 

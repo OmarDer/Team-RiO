@@ -349,11 +349,11 @@ public class NNetwork {
            return ulaz;
        }
        
-        public double[][] weatherForecast() throws ParseException 
+        public ArrayList<Prognoza> weatherForecast(int brDana) throws ParseException 
         {
                 Location l=LocationService.getClientLocation();
                 WebService ws=new WebService("http://api.worldweatheronline.com/premium/v1/past-weather.ashx", "c868e1f7b5a24e97a44211932160711");
-                ArrayList<Prognoza> prognoze=ws.getHistorijskePodatkeByLocation(l, 12);
+                ArrayList<Prognoza> prognoze=ws.getHistorijskePodatkeByLocation(l, brDana);
                 
                 formatirajUlaznePodatke(prognoze);
                 formatirajIzlaznePodatke(prognoze);
@@ -388,23 +388,192 @@ public class NNetwork {
                     vrijeme[2][i]=rezultati3[i];
                 }
                 
-                return vrijeme;
+                //rezultati=nn.weatherForecast();
+                for(int i=0;i<3;i++)
+                {
+                    for(int j=0;j<5;j++)
+                    {
+                       System.out.print(vrijeme[i][j]+" "); 
+                    }
+                    System.out.printf("%n");
+                }
+                //return vrijeme;
+                
+                double temp = 0;
+                String vr = "";
+                
+                ArrayList<Prognoza> lista = new ArrayList<Prognoza>();
+                
+                for(int i=0; i < 3; i++ ){
+                    
+                    temp = vrijeme[i][0];
+                    vr = "";
+                    
+                    for(int j=0; j < 5; j++){
+                        
+                        if(vrijeme[i][j] == 1.0 && j != 0)
+                        {
+                            switch(j){
+                                case 1:{
+                                            vr = "Cloudy";
+                                            break;
+                                        }
+                                case 2: {
+                                            vr = "Sunny";
+                                            break;
+                                        }
+                                case 3: {
+                                            vr = "Snow";
+                                            break;
+                                        }
+                                case 4: {
+                                            vr = "Rain";
+                                            break;
+                                        }
+                                default: {
+                                            vr = "Undefined";
+                                            break;
+                                         }
+                            }
+                        }
+                    }
+                    
+                    lista.add(new Prognoza(temp, vr, l.getCity()));
+                    
+                    
+                }
+                
+                return lista;
+                
+        }
+        
+        public String weatherForecastByCityJSON(int brDana, String grad) throws ParseException 
+        {
+                Location l = LocationService.getClientLocation();
+                l.setCity(grad);
+                
+                WebService ws=new WebService("http://api.worldweatheronline.com/premium/v1/past-weather.ashx", "c868e1f7b5a24e97a44211932160711");
+                ArrayList<Prognoza> prognoze=ws.getHistorijskePodatkeByLocation(l, brDana);
+                
+                formatirajUlaznePodatke(prognoze);
+                formatirajIzlaznePodatke(prognoze);
+                
+                pripremiPodatke();
+                kreirajMrezu();
+                trenirajMrezu();
+                
+                int si=prognoze.size()-1;
+                double [][]ulaz=prilagodi(prognoze.get(si));
+                
+                ulaz=normNiz(ulaz);
+                double []rezultati=testirajMrezicu(ulaz);       //Predvidjanje za jedan dan
+                
+                ulaz=dajNoviUlaz(rezultati);
+                double []rezultati2=testirajMrezicu(ulaz);      //Predvidjanje za dva dana
+                
+                ulaz=dajNoviUlaz(rezultati2);
+                double[]rezultati3=testirajMrezicu(ulaz);        //Previdjanje za tri dana
+                
+                double [][]vrijeme=new double [3][5];
+                for(int i=0;i<5;i++)
+                {
+                    vrijeme[0][i]=rezultati[i];
+                }
+                for(int i=0;i<5;i++)
+                {
+                    vrijeme[1][i]=rezultati2[i];
+                }
+                for(int i=0;i<5;i++)
+                {
+                    vrijeme[2][i]=rezultati3[i];
+                }
+                
+                //rezultati=nn.weatherForecast();
+                for(int i=0;i<3;i++)
+                {
+                    for(int j=0;j<5;j++)
+                    {
+                       System.out.print(vrijeme[i][j]+" "); 
+                    }
+                    System.out.printf("%n");
+                }
+                //return vrijeme;
+                
+                double temp = 0;
+                String vr = "";
+                
+                prognoze = new ArrayList<Prognoza>();
+                
+                for(int i=0; i < 3; i++ ){
+                    
+                    temp = vrijeme[i][0];
+                    vr = "";
+                    
+                    for(int j=0; j < 5; j++){
+                        
+                        if(vrijeme[i][j] == 1.0 && j != 0)
+                        {
+                            switch(j){
+                                case 1:{
+                                            vr = "Cloudy";
+                                            break;
+                                        }
+                                case 2: {
+                                            vr = "Sunny";
+                                            break;
+                                        }
+                                case 3: {
+                                            vr = "Snow";
+                                            break;
+                                        }
+                                case 4: {
+                                            vr = "Rain";
+                                            break;
+                                        }
+                                default: {
+                                            vr = "Undefined";
+                                            break;
+                                         }
+                            }
+                        }
+                    }
+                    
+                    prognoze.add(new Prognoza(temp, vr, l.getCity()));
+                    
+                    
+                }
+                
+                String jsonString = "{";
+                jsonString += "\"dan1\":{\"vrijeme\":\""+ prognoze.get(0).getVrijeme() + "\", \"temperatura\":\"" + prognoze.get(0).getTemperatura() + "\"},";
+                jsonString += "\"dan2\":{\"vrijeme\":\""+ prognoze.get(1).getVrijeme() + "\", \"temperatura\":\"" + prognoze.get(1).getTemperatura() + "\"},";
+                jsonString += "\"dan3\":{\"vrijeme\":\""+ prognoze.get(2).getVrijeme() + "\", \"temperatura\":\"" + prognoze.get(2).getTemperatura() + "\"}";
+                jsonString += "}";
+                
+                return jsonString;
                 
         }
        
 	public static void main( String[] args ) throws ParseException
         {   
                 NNetwork nn=new NNetwork();
-                double [][]rezultati=new double[3][5];
-                rezultati=nn.weatherForecast();
-                for(int i=0;i<3;i++)
+                ArrayList<Prognoza> prog = nn.weatherForecast(12);
+                //rezultati=nn.weatherForecast();
+                //for(int i=0;i<3;i++)
+                //{
+                //    for(int j=0;j<5;j++)
+                //    {
+                //       System.out.print(rezultati[i][j]+" "); 
+                //    }
+                //    System.out.printf("%n");
+                //}
+                
+                for(Prognoza x : prog)
                 {
-                    for(int j=0;j<5;j++)
-                    {
-                       System.out.print(rezultati[i][j]+" "); 
-                    }
-                    System.out.printf("%n");
+                    System.out.println("Temperatura: " + x.getTemperatura());
+                    System.out.println("Vrijeme: " + x.getVrijeme());
                 }
+                
+                    
 
         }
         

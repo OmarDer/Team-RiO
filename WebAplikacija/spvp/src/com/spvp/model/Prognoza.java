@@ -29,6 +29,14 @@ public class Prognoza {
         this.pritisakZraka = pritisakZraka;
         this.brzinaVjetra = brzinaVjetra;
         this.vrijeme = vrijeme;
+        this.weatherIcon = setweatherIcon(vrijeme);
+    }
+
+    public Prognoza(double temp, String vr, String city) {
+        this.zaGrad = city;
+        this.temperatura = String.valueOf(temp);
+        this.vrijeme = vr;
+        this.weatherIcon = setweatherIcon(vrijeme);
     }
 
     public String getWeatherIcon() {
@@ -94,6 +102,31 @@ public class Prognoza {
 
     public void setDatum(Date datum) {
         this.datum = datum;
+    }
+    
+    private String setweatherIcon(String vrijeme){
+        
+        String vr = vrijeme.toLowerCase();
+
+            if(vr.contains("sunny")){
+                return "resources/images/sunny.jpg";
+            }
+            else if(vr.contains("rain")){
+                return "resources/images/rain.jpg";
+            }
+            else if(vr.contains("snow")){
+                return "resources/images/snow.jpg";
+            }
+            else if(vr.contains("cloudy") || vr.contains("overcast")){
+                return "resources/images/clouds.jpg";
+            }
+            else if(vr.contains("light drizzle")){
+                return "resources/images/rain.jpg";
+            }
+            else if(vr.contains("fog") || vr.contains("mist")){
+                return "resources/images/fog.jpg";
+            }
+            return "";
     }
     
     

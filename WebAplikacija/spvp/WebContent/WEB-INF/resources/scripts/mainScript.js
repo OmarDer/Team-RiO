@@ -28,6 +28,24 @@ function initializeEvents(){
     
 	});
 
+	$('#mainFormNaredniDani').submit(function(e) {
+    	e.preventDefault();
+
+
+    	var grad = $("#mainInputFieldNaredniDani").val();
+
+    	var URL = "http://localhost:8084/spvp/prognozatridana/" + grad;
+
+    	$.ajax({
+		  url: URL,
+		  success: prikaziVrijemeNarednaTriDana,
+		  dataType:'json',
+	      type: 'get',
+		});
+
+    
+	});
+
 	$('#navForm').submit(function(e) {
     	e.preventDefault();
 
@@ -45,6 +63,116 @@ function initializeEvents(){
 
     
 	});
+
+	$('#navFormNaredniDani').submit(function(e) {
+    	e.preventDefault();
+
+
+    	var grad = $("#navInputFieldNaredniDani").val();
+
+    	var URL = "http://localhost:8084/spvp/prognozatridana/" + grad;
+
+    	$.ajax({
+		  url: URL,
+		  success: prikaziVrijemeNarednaTriDanaNav,
+		  dataType:'json',
+	      type: 'get',
+		});
+
+    
+	});
+}
+
+function prikaziVrijemeNarednaTriDanaNav(data, status, jqXHR){
+	if(status == "success"){
+		var x = JSON.stringify(data);
+		var obj = jQuery.parseJSON(x);
+		//alert(obj.data.current_condition[0].weatherDesc[0].value);
+		var vrijemeDan1 = "<p>Vrijeme: " + obj.dan1.vrijeme + "</p>" + 
+						  "<p>Temperatura: " + obj.dan1.temperatura + "&deg;C</p>";
+
+		var vrijemeDan2 = "<p>Vrijeme: " + obj.dan2.vrijeme + "</p>" + 
+						  "<p>Temperatura: " + obj.dan2.temperatura + "&deg;C</p>";
+
+		var vrijemeDan3 = "<p>Vrijeme: " + obj.dan3.vrijeme + "</p>" + 
+						  "<p>Temperatura: " + obj.dan3.temperatura + "&deg;C</p>";
+			                     
+		$("#izvjestajOVremenuDan1").html(vrijemeDan1);
+		$("#izvjestajOVremenuDan2").html(vrijemeDan2);
+		$("#izvjestajOVremenuDan3").html(vrijemeDan3);
+
+		$("#weatherImageDan1").attr("src", postaviIkonu(obj.dan1.vrijeme));
+		$("#weatherImageDan2").attr("src", postaviIkonu(obj.dan2.vrijeme));
+		$("#weatherImageDan3").attr("src", postaviIkonu(obj.dan3.vrijeme));
+
+		var grad = $("#navInputFieldNaredniDani").val();
+		
+		var latitude = 0;
+		var longitude = 0;
+		var zaGrad;
+
+		$.ajax({url: "http://maps.google.com/maps/api/geocode/json?address=" + grad + "&sensor=false&region=ba", success: function(coordinates){
+        	latitude = coordinates.results[0].geometry.location.lat;
+            longitude = coordinates.results[0].geometry.location.lng;
+            zaGrad = coordinates.results[0].address_components[0].long_name;
+            $("#vrijemeZaGrad").html(zaGrad);
+            azurirajMapu(latitude, longitude);
+    	}});
+
+		$("#mainInputFieldNaredniDani").val("");
+		$("#navInputFieldNaredniDani").val("");
+		
+
+	}
+	else{
+		alert("nije uspjelo");
+	}
+}
+
+function prikaziVrijemeNarednaTriDana(data, status, jqXHR){
+	if(status == "success"){
+		var x = JSON.stringify(data);
+		var obj = jQuery.parseJSON(x);
+		//alert(obj.data.current_condition[0].weatherDesc[0].value);
+		var vrijemeDan1 = "<p>Vrijeme: " + obj.dan1.vrijeme + "</p>" + 
+						  "<p>Temperatura: " + obj.dan1.temperatura + "&deg;C</p>";
+
+		var vrijemeDan2 = "<p>Vrijeme: " + obj.dan2.vrijeme + "</p>" + 
+						  "<p>Temperatura: " + obj.dan2.temperatura + "&deg;C</p>";
+
+		var vrijemeDan3 = "<p>Vrijeme: " + obj.dan3.vrijeme + "</p>" + 
+						  "<p>Temperatura: " + obj.dan3.temperatura + "&deg;C</p>";
+			                     
+		$("#izvjestajOVremenuDan1").html(vrijemeDan1);
+		$("#izvjestajOVremenuDan2").html(vrijemeDan2);
+		$("#izvjestajOVremenuDan3").html(vrijemeDan3);
+
+		$("#weatherImageDan1").attr("src", postaviIkonu(obj.dan1.vrijeme));
+		$("#weatherImageDan2").attr("src", postaviIkonu(obj.dan2.vrijeme));
+		$("#weatherImageDan3").attr("src", postaviIkonu(obj.dan3.vrijeme));
+
+		var grad = $("#mainInputFieldNaredniDani").val();
+		
+		var latitude = 0;
+		var longitude = 0;
+		var zaGrad;
+
+		$.ajax({url: "http://maps.google.com/maps/api/geocode/json?address=" + grad + "&sensor=false&region=ba", success: function(coordinates){
+        	latitude = coordinates.results[0].geometry.location.lat;
+            longitude = coordinates.results[0].geometry.location.lng;
+            zaGrad = coordinates.results[0].address_components[0].long_name;
+            $("#vrijemeZaGrad").html(zaGrad);
+            azurirajMapu(latitude, longitude);
+    	}});
+
+		$("#mainInputFieldNaredniDani").val("");
+		$("#navInputFieldNaredniDani").val("");
+		
+
+	}
+	else{
+		alert("nije uspjelo");
+	}
 }
 
 function prikaziVrijeme(data, status, jqXHR){

@@ -5,7 +5,9 @@ import com.spvp.model.Prognoza;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import java.util.Date;
 
@@ -117,27 +119,103 @@ public class WebService {
         public ArrayList<Prognoza> getHistorijskePodatkeByLocation(Location lokacija, int brZadnjihDana) throws ParseException
         {
             Date danasnji = new Date();
-            long x = 24 * 3600 * 1000;
-            Date end = new Date(danasnji.getTime() - x );
-            x = brZadnjihDana * 24 * 3600 * 1000;
-            Date start = new Date(end.getTime() - x );
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(danasnji);
+            cal.add(Calendar.DATE, -1*brZadnjihDana);
             
-            if(start.getMonth() != end.getMonth()){
-                start = new Date();
-                start.setDate(1);
+            Date start = cal.getTime();
+            
+            //long x = 24 * 3600 * 1000;
+            Date end = danasnji;
+            //x = brZadnjihDana * 24 * 3600 * 1000;
+            //Date start = new Date(end.getTime() - x );
+            
+            System.out.println("Pocetni datum: " + start.toString());
+            System.out.println("Krajnji datum: "+end.toString());
+
+            
+            ArrayList<Date> pocetniDatumi = new ArrayList<Date>();
+            ArrayList<Date> krajnjiDatumi = new ArrayList<Date>();
+            
+            Date temp;
+            Date noviPocetni;
+            
+            pocetniDatumi.add(start);
+            
+            for(int i = 0;; i++){
+                
+                if(pocetniDatumi.get(i).getMonth() == end.getMonth()){
+                    krajnjiDatumi.add(end);
+                    
+                    for(int j=0; j<pocetniDatumi.size(); j++)
+                    {
+                            System.out.println(pocetniDatumi.get(j).toString());
+                            System.out.println(krajnjiDatumi.get(j).toString());
+
+                    }
+                    
+                    break;
+                }
+                
+                //System.out.println(pocetniDatumi.get(i).toString());
+
+                //System.out.println(pocetniDatumi.get(i).getYear() + 1900);
+                //System.out.println(pocetniDatumi.get(i).getMonth());
+                //System.out.println(pocetniDatumi.get(i).getDate());
+
+                
+                YearMonth yearMonthObject = YearMonth.of(pocetniDatumi.get(i).getYear() + 1900, pocetniDatumi.get(i).getMonth() + 1);
+                //int daysInMonth = yearMonthObject.lengthOfMonth();
+                
+                temp = new Date();
+                
+                temp.setMonth(pocetniDatumi.get(i).getMonth());
+                temp.setYear(pocetniDatumi.get(i).getYear());
+                temp.setDate(yearMonthObject.lengthOfMonth());
+                
+                krajnjiDatumi.add(temp);
+                
+                
+                noviPocetni = new Date();
+                
+                noviPocetni.setMonth(temp.getMonth() + 1);
+                noviPocetni.setYear(temp.getYear());
+                noviPocetni.setDate(1);
+                
+                pocetniDatumi.add(noviPocetni);
+                
             }
             
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            String startDate = df.format(start);
-            String endDate = df.format(end);
+            ArrayList<Prognoza> vracena;
+            ArrayList<Prognoza> konacnaLista = new ArrayList<>();
             
-            long diff = end.getTime() - start.getTime();
-            long brDana = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+            for(int i=0; i < pocetniDatumi.size(); i++){
+                
+                
+                String startDate = df.format(pocetniDatumi.get(i));
+                String endDate = df.format(krajnjiDatumi.get(i));
+                
+                long diff = krajnjiDatumi.get(i).getTime() - pocetniDatumi.get(i).getTime();
+                long brDana = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 
-            String countryCode = lokacija.getCountryCode().toLowerCase();
-            String result = getRestTemplate().getForObject(this.basicUrl + "?q=" + lokacija.getCity() + ","+ countryCode +"&key=" + apiKey + "&date="+startDate+"&enddate="+endDate+"&tp=24&includelocation=yes&format=json", String.class);
+                String countryCode = lokacija.getCountryCode().toLowerCase();
+                String result = getRestTemplate().getForObject(this.basicUrl + "?q=" + lokacija.getCity() + ","+ countryCode +"&key=" + apiKey + "&date="+startDate+"&enddate="+endDate+"&tp=24&includelocation=yes&format=json", String.class);
 
-            return parsirajJSONObjectUListu(new JSONObject(result), brDana);
+                vracena = parsirajJSONObjectUListu(new JSONObject(result), brDana);
+            
+                konacnaLista.addAll(vracena);
+            }
+            
+            return konacnaLista;
+                
+        }
+        
+        public static void main(String []args) throws ParseException{
+            WebService weather = new WebService("http://api.worldweatheronline.com/premium/v1/past-weather.ashx", "c868e1f7b5a24e97a44211932160711");
+             
+             weather.getHistorijskePodatkeByLocation(LocationService.getClientLocation(), 11);
+	
         }
        
 }

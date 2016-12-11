@@ -41,8 +41,9 @@ public class NNetwork {
         private double maxBv;
         private double minBv;
         private int velProblema;
+        private WebService ws;
 	
-	public NNetwork(){
+	public NNetwork(IWebService webService){
 		network = new BasicNetwork();
                 trError=0.0;
                 maxT=0.0;
@@ -51,6 +52,7 @@ public class NNetwork {
                 minV=0.0;
                 maxBv=0.0;
                 minBv=0.0;
+                ws = new WebService(webService);
 	}
         
         private void formatirajUlaznePodatke(ArrayList<Prognoza>prognoze)
@@ -352,8 +354,8 @@ public class NNetwork {
         public ArrayList<Prognoza> weatherForecast(int brDana) throws ParseException 
         {
                 Location l=LocationService.getClientLocation();
-                WebService ws=new WebService("http://api.worldweatheronline.com/premium/v1/past-weather.ashx", "c868e1f7b5a24e97a44211932160711");
-                ArrayList<Prognoza> prognoze=ws.getHistorijskePodatkeByLocation(l, brDana);
+                
+                ArrayList<Prognoza> prognoze = ws.getHistorijskePodatkeByLocation(l, brDana);
                 
                 formatirajUlaznePodatke(prognoze);
                 formatirajIzlaznePodatke(prognoze);
@@ -402,7 +404,7 @@ public class NNetwork {
                 double temp = 0;
                 String vr = "";
                 
-                ArrayList<Prognoza> lista = new ArrayList<Prognoza>();
+                ArrayList<Prognoza> lista = new ArrayList<>();
                 
                 for(int i=0; i < 3; i++ ){
                     
@@ -452,7 +454,6 @@ public class NNetwork {
                 Location l = LocationService.getClientLocation();
                 l.setCity(grad);
                 
-                WebService ws=new WebService("http://api.worldweatheronline.com/premium/v1/past-weather.ashx", "c868e1f7b5a24e97a44211932160711");
                 ArrayList<Prognoza> prognoze=ws.getHistorijskePodatkeByLocation(l, brDana);
                 
                 formatirajUlaznePodatke(prognoze);
@@ -489,20 +490,20 @@ public class NNetwork {
                 }
                 
                 //rezultati=nn.weatherForecast();
-                for(int i=0;i<3;i++)
-                {
-                    for(int j=0;j<5;j++)
-                    {
-                       System.out.print(vrijeme[i][j]+" "); 
-                    }
-                    System.out.printf("%n");
-                }
+                //for(int i=0;i<3;i++)
+                //{
+                //    for(int j=0;j<5;j++)
+                //    {
+                //       System.out.print(vrijeme[i][j]+" "); 
+                //    }
+                //    System.out.printf("%n");
+                //}
                 //return vrijeme;
                 
                 double temp = 0;
                 String vr = "";
                 
-                prognoze = new ArrayList<Prognoza>();
+                prognoze = new ArrayList<>();
                 
                 for(int i=0; i < 3; i++ ){
                     
@@ -553,10 +554,10 @@ public class NNetwork {
                 
         }
        
-	public static void main( String[] args ) throws ParseException
-        {   
-                NNetwork nn=new NNetwork();
-                ArrayList<Prognoza> prog = nn.weatherForecast(12);
+	//public static void main( String[] args ) throws ParseException
+        //{   
+        //        NNetwork nn=new NNetwork();
+        //        ArrayList<Prognoza> prog = nn.weatherForecast(12);
                 //rezultati=nn.weatherForecast();
                 //for(int i=0;i<3;i++)
                 //{
@@ -567,15 +568,15 @@ public class NNetwork {
                 //    System.out.printf("%n");
                 //}
                 
-                for(Prognoza x : prog)
-                {
-                    System.out.println("Temperatura: " + x.getTemperatura());
-                    System.out.println("Vrijeme: " + x.getVrijeme());
-                }
+        //        for(Prognoza x : prog)
+        //        {
+        //            System.out.println("Temperatura: " + x.getTemperatura());
+        //            System.out.println("Vrijeme: " + x.getVrijeme());
+        //        }
                 
                     
 
-        }
+       // }
         
 	
 	

@@ -11,6 +11,9 @@ package com.spvp.network;
  */
 import org.encog.*;
 import org.encog.engine.network.activation.ActivationSigmoid;
+import org.encog.neural.networks.training.propagation.quick.QuickPropagation;
+import org.encog.neural.networks.training.lma.LevenbergMarquardtTraining;
+import org.encog.neural.networks.training.propagation.back.Backpropagation;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
 import org.encog.Encog;
@@ -189,7 +192,7 @@ public class NNetwork {
 	public void kreirajMrezu()
 	{
 		network.addLayer(new BasicLayer(null,true,7));
-		network.addLayer(new BasicLayer(new ActivationSigmoid(),true,450));
+		network.addLayer(new BasicLayer(new ActivationSigmoid(),true,420));
                 network.addLayer(new BasicLayer(new ActivationSigmoid(),true,20));
 		network.addLayer(new BasicLayer(new ActivationSigmoid(),false,5));
 		network.getStructure().finalizeStructure();
@@ -198,7 +201,7 @@ public class NNetwork {
 	
 	public void trenirajMrezu()
 	{
-		final ResilientPropagation train = new ResilientPropagation(network, trainingSet);
+		final Backpropagation train = new Backpropagation(network, trainingSet);
 		int epoch = 1;
 
 		do {
@@ -206,7 +209,7 @@ public class NNetwork {
 			//System.out.println("Epoch #" + epoch + " Error:" + train.getError());
 			epoch++;
                         trError=train.getError();
-		} while(train.getError() > 0.0000001 && epoch<=470);
+		} while(train.getError() > 0.09 && epoch<=470);
 		train.finishTraining();
 	}
 	
@@ -554,10 +557,13 @@ public class NNetwork {
                 
         }
        
-	//public static void main( String[] args ) throws ParseException
-        //{   
-        //        NNetwork nn=new NNetwork();
-        //        ArrayList<Prognoza> prog = nn.weatherForecast(12);
+	public static void main( String[] args ) throws ParseException
+        {   
+                
+               /*
+                NNetwork nn=new NNetwork();
+                ArrayList<Prognoza> prog = nn.weatherForecast(12);
+                
                 //rezultati=nn.weatherForecast();
                 //for(int i=0;i<3;i++)
                 //{
@@ -568,15 +574,15 @@ public class NNetwork {
                 //    System.out.printf("%n");
                 //}
                 
-        //        for(Prognoza x : prog)
-        //        {
-        //            System.out.println("Temperatura: " + x.getTemperatura());
-        //            System.out.println("Vrijeme: " + x.getVrijeme());
-        //        }
-                
+                for(Prognoza x : prog)
+               {
+                    System.out.println("Temperatura: " + x.getTemperatura());
+                    System.out.println("Vrijeme: " + x.getVrijeme());
+               }
+                */
                     
 
-       // }
+        }
         
 	
 	

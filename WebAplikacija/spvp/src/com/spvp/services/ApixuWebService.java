@@ -33,6 +33,7 @@ public class ApixuWebService implements IWebService{
  
 
     private RestTemplate getRestTemplate() {
+        
         if (restTemplate == null) {
             restTemplate = new RestTemplate();
         }

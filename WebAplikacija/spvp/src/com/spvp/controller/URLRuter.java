@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class URLRuter {
     
-        WebService webService = new WebService(new WorldWeatherOnlineWebService());
+        WebService webService = new WebService(new ApixuWebService());
         NNetwork nn = new NNetwork(new WorldWeatherOnlineWebService());
     
 	@RequestMapping(value="/", method = RequestMethod.GET)
@@ -51,6 +51,12 @@ public class URLRuter {
 	public ModelAndView vrijemeUBiH(HttpServletRequest request) throws ParseException {
             
                 return new ModelAndView("vrijemeubih");
+	}
+        
+        @RequestMapping(value="/vrijemenarednidanibih", method = RequestMethod.GET)
+	public ModelAndView vrijemeUBiHNaredniDani(HttpServletRequest request) throws ParseException {
+            
+                return new ModelAndView("vrijemenarednidanibih");
 	}
         
         @RequestMapping(value="/prognozatridana/{grad}", method = RequestMethod.GET)

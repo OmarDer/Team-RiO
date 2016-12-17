@@ -117,7 +117,7 @@
                         <li><a href="/spvp">Vrijeme danas</a></li>
                         <li class="active"><a href="/spvp/narednatridana">Vrijeme naredna tri dana</a></li>
                         <li><a href="/spvp/vrijemeubih">Vrijeme u BiH</a></li>
-                        <li><a href="#">Vrijeme naredna tri dana u BiH</a></li>
+                        <li><a href="/spvp/vrijemenarednidanibih">Vrijeme naredna tri dana u BiH</a></li>
                       </ul>
                       <form id="navFormNaredniDani" class="form-inline navbar-form navbar-right">
                         <div class="form-group">

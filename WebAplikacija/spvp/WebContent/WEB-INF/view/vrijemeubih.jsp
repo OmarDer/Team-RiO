@@ -60,7 +60,7 @@
                     
                 </div>
 
-                <img id="backgroundImage" src="resources/images/background.jpg">
+                
                         
 
                 

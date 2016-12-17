@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class URLRuter {
     
-        WebService webService = new WebService(new ApixuWebService());
+        WebService webService = new WebService(new WorldWeatherOnlineWebService());
         NNetwork nn = new NNetwork(new WorldWeatherOnlineWebService());
     
 	@RequestMapping(value="/", method = RequestMethod.GET)

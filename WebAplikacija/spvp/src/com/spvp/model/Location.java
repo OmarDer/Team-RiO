@@ -83,6 +83,12 @@ public class Location {
     }
     
     
+    public Grad getGrad(){
+        return new Grad(city, longitude, latitude);
+    }
+    
+    
+    
     
     
     

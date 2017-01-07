@@ -41,7 +41,7 @@
     {
         if(prog != null)
         {
-            return prog.getZaGrad();
+            return prog.getZaGrad().getImeGrada();
         } 
         else
             return "";

@@ -70,7 +70,7 @@ public class ApixuWebService implements IWebService{
         
         String result;
         
-        while(start.getDate() - 1 != end.getDate() || start.getMonth() != end.getMonth() || start.getYear() != end.getYear()){
+        while(start.getDate() - 2 != end.getDate() || start.getMonth() != end.getMonth() || start.getYear() != end.getYear()){
             
             datum = df.format(start);
             //http://api.apixu.com/v1/history.json?key=5c178ad8fa9a4bacb63154040161112&q=Sarajevo&dt=2016-12-01
@@ -148,7 +148,7 @@ public class ApixuWebService implements IWebService{
         pritisak = pritisak / prognozaPoSatima.length();
         vlaznostZraka = vlaznostZraka / prognozaPoSatima.length();
         
-        Prognoza prog = new Prognoza(zaGrad,  String.valueOf(temperatura),  String.valueOf(vlaznostZraka),  String.valueOf(pritisak),  String.valueOf(brzinaVjetra), vrijeme);
+        Prognoza prog = new Prognoza(LocationService.getLocationByCityName(zaGrad).getGrad(),  String.valueOf(temperatura),  String.valueOf(vlaznostZraka),  String.valueOf(pritisak),  String.valueOf(brzinaVjetra), vrijeme);
         
         prog.setDatum(datum);
         
@@ -170,12 +170,18 @@ public class ApixuWebService implements IWebService{
         Double vlaznostZraka = current.getDouble("humidity");
         Date datum = format.parse(current.getString("last_updated"));
         
-        Prognoza prog = new Prognoza(zaGrad,  String.valueOf(temperatura),  String.valueOf(vlaznostZraka),  String.valueOf(pritisak),  String.valueOf(brzinaVjetra), vrijeme);
+        Prognoza prog = new Prognoza(LocationService.getLocationByCityName(zaGrad).getGrad(),  String.valueOf(temperatura),  String.valueOf(vlaznostZraka),  String.valueOf(pritisak),  String.valueOf(brzinaVjetra), vrijeme);
         
         prog.setDatum(datum);
         
         return prog;
         
     }
+
+    @Override
+    public Prognoza getHistorijskePodatkeByLocationOnSpecificDate(Location lokacija, Calendar cal) throws ParseException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     
 }

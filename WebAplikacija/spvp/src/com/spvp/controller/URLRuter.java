@@ -1,10 +1,11 @@
 package com.spvp.controller;
 
+import com.spvp.dal.MySqlDatabase;
 import com.spvp.network.NNetwork;
-import com.spvp.services.ApixuWebService;
 import com.spvp.services.LocationService;
 import com.spvp.services.WebService;
 import com.spvp.services.WorldWeatherOnlineWebService;
+import java.sql.SQLException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class URLRuter {
     
         WebService webService = new WebService(new WorldWeatherOnlineWebService());
-        NNetwork nn = new NNetwork(new WorldWeatherOnlineWebService());
+        NNetwork nn = new NNetwork(MySqlDatabase.getInstance());
     
 	@RequestMapping(value="/", method = RequestMethod.GET)
 	public ModelAndView pocetna(HttpServletRequest request) {
@@ -42,7 +43,7 @@ public class URLRuter {
 	}
         
         @RequestMapping(value="/narednatridana", method = RequestMethod.GET)
-	public ModelAndView prognozaNarednaTriDana(HttpServletRequest request) throws ParseException {
+	public ModelAndView prognozaNarednaTriDana(HttpServletRequest request) throws ParseException, SQLException {
             
                 return new ModelAndView("narednatridana", "prognoza", nn.weatherForecast(15));
 	}
@@ -60,7 +61,7 @@ public class URLRuter {
 	}
         
         @RequestMapping(value="/prognozatridana/{grad}", method = RequestMethod.GET)
-	public ModelAndView prognozaTriDana(@PathVariable("grad") String city, HttpServletRequest request) throws ParseException {
+	public ModelAndView prognozaTriDana(@PathVariable("grad") String city, HttpServletRequest request) throws ParseException, SQLException {
             
                 return new ModelAndView("prognozatridana", "json", nn.weatherForecastByCityJSON(15, city));
 	}

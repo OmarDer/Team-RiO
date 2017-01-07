@@ -19,10 +19,10 @@ import org.springframework.web.client.RestTemplate;
 
 public class WorldWeatherOnlineWebService implements IWebService {
 
-    private String basicUrl;
-    private String historyUrl;
+    private final String basicUrl;
+    private final String historyUrl;
     private RestTemplate restTemplate;
-    private String apiKey;
+    private final String apiKey;
 
     private RestTemplate getRestTemplate() {
         if (restTemplate == null) {
@@ -35,7 +35,7 @@ public class WorldWeatherOnlineWebService implements IWebService {
     public WorldWeatherOnlineWebService() {
         this.basicUrl = "http://api.worldweatheronline.com/premium/v1/weather.ashx";
         this.historyUrl = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx";
-        this.apiKey = "c868e1f7b5a24e97a44211932160711";
+        this.apiKey = "67f8e93988414397bf2234724161212";
     }
 
     private Prognoza parsirajJSONObject(JSONObject json) {
@@ -51,12 +51,13 @@ public class WorldWeatherOnlineWebService implements IWebService {
         String brzinaVjetra = trenutnoStanje.getString("windspeedKmph");
         String vrijeme = trenutnoStanje.getJSONArray("weatherDesc").getJSONObject(0).getString("value");
 
-        Prognoza prog = new Prognoza(gradName, temp, vlaznostZraka, pritisak, brzinaVjetra, vrijeme);
+        Prognoza prog = new Prognoza(LocationService.getLocationByCityName(gradName).getGrad(), temp, vlaznostZraka, pritisak, brzinaVjetra, vrijeme);
 
         return prog;
     }
 
     private ArrayList<Prognoza> parsirajJSONObjectUListu(JSONObject json, long brDana) throws ParseException {
+        
         JSONObject podaci = json.getJSONObject("data");
         JSONObject nearestArea = podaci.getJSONArray("nearest_area").getJSONObject(0);
         JSONArray weatherArray = podaci.getJSONArray("weather");
@@ -77,6 +78,8 @@ public class WorldWeatherOnlineWebService implements IWebService {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
         ArrayList<Prognoza> lista = new ArrayList<>();
+        
+        if(brDana == 1) brDana--;
 
         for (int i = 0; i <= brDana; i++) {
             trenutnoStanje = weatherArray.getJSONObject(i);
@@ -91,7 +94,7 @@ public class WorldWeatherOnlineWebService implements IWebService {
             brzinaVjetra = vrijemeZaDan.getString("windspeedKmph");
             vrijeme = vrijemeZaDan.getJSONArray("weatherDesc").getJSONObject(0).getString("value");
 
-            prog = new Prognoza(gradName, temp, vlaznostZraka, pritisak, brzinaVjetra, vrijeme);
+            prog = new Prognoza(LocationService.getLocationByCityName(gradName).getGrad(), temp, vlaznostZraka, pritisak, brzinaVjetra, vrijeme);
 
             prog.setDatum(datum);
 
@@ -117,65 +120,47 @@ public class WorldWeatherOnlineWebService implements IWebService {
     @Override
     public ArrayList<Prognoza> getHistorijskePodatkeByLocation(Location lokacija, int brZadnjihDana) throws ParseException {
         
+        String a = lokacija.getCity();
         Date danasnji = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(danasnji);
+        
+        if(cal.get(Calendar.HOUR_OF_DAY) < 1)
+            cal.add(Calendar.DATE, -1);
+        
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.HOUR, 0);
+        
+        Date end = cal.getTime();
+        brZadnjihDana--;
         cal.add(Calendar.DATE, -1 * brZadnjihDana);
-
-        Date start = cal.getTime();
-
-        //long x = 24 * 3600 * 1000;
-        Date end = danasnji;
-        //x = brZadnjihDana * 24 * 3600 * 1000;
-        //Date start = new Date(end.getTime() - x );
-
-        System.out.println("Pocetni datum: " + start.toString());
-        System.out.println("Krajnji datum: " + end.toString());
 
         ArrayList<Date> pocetniDatumi = new ArrayList<>();
         ArrayList<Date> krajnjiDatumi = new ArrayList<>();
+        
+        Calendar endCal = Calendar.getInstance();
+        endCal.setTime(end);
 
-        Date temp;
-        Date noviPocetni;
-
-        pocetniDatumi.add(start);
+        pocetniDatumi.add(cal.getTime());
 
         for (int i = 0;; i++) {
 
-            if (pocetniDatumi.get(i).getMonth() == end.getMonth()) {
-                krajnjiDatumi.add(end);
-
-                for (int j = 0; j < pocetniDatumi.size(); j++) {
-                    System.out.println(pocetniDatumi.get(j).toString());
-                    System.out.println(krajnjiDatumi.get(j).toString());
-
-                }
-
+            if (cal.get(Calendar.MONTH) == endCal.get(Calendar.MONTH)) {
+                krajnjiDatumi.add(endCal.getTime());
                 break;
             }
+            
+            YearMonth yearMonthObject = YearMonth.of(cal.get(Calendar.YEAR) , cal.get(Calendar.MONTH) + 1);
+            cal.set(Calendar.DATE, yearMonthObject.lengthOfMonth());
+           
 
-            //System.out.println(pocetniDatumi.get(i).toString());
-            //System.out.println(pocetniDatumi.get(i).getYear() + 1900);
-            //System.out.println(pocetniDatumi.get(i).getMonth());
-            //System.out.println(pocetniDatumi.get(i).getDate());
-            YearMonth yearMonthObject = YearMonth.of(pocetniDatumi.get(i).getYear() + 1900, pocetniDatumi.get(i).getMonth() + 1);
-            //int daysInMonth = yearMonthObject.lengthOfMonth();
+            krajnjiDatumi.add(cal.getTime());
+            
+            cal.add(Calendar.DATE, 1);
 
-            temp = new Date();
-
-            temp.setMonth(pocetniDatumi.get(i).getMonth());
-            temp.setYear(pocetniDatumi.get(i).getYear());
-            temp.setDate(yearMonthObject.lengthOfMonth());
-
-            krajnjiDatumi.add(temp);
-
-            noviPocetni = new Date();
-
-            noviPocetni.setMonth(temp.getMonth() + 1);
-            noviPocetni.setYear(temp.getYear());
-            noviPocetni.setDate(1);
-
-            pocetniDatumi.add(noviPocetni);
+            pocetniDatumi.add(cal.getTime());
 
         }
 
@@ -191,9 +176,8 @@ public class WorldWeatherOnlineWebService implements IWebService {
             long diff = krajnjiDatumi.get(i).getTime() - pocetniDatumi.get(i).getTime();
             long brDana = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 
-            String countryCode = lokacija.getCountryCode().toLowerCase();
-            //System.out.print(this.basicUrl + "?q=" + lokacija.getCity() + "," + countryCode + "&key=" + apiKey + "&date=" + startDate + "&enddate=" + endDate + "&tp=24&includelocation=yes&format=json");
-            String result = getRestTemplate().getForObject(this.historyUrl + "?q=" + lokacija.getCity() + "," + countryCode + "&key=" + apiKey + "&date=" + startDate + "&enddate=" + endDate + "&tp=24&includelocation=yes&format=json", String.class);
+            //System.out.println(this.historyUrl + "?q=" + lokacija.getCity() + ",ba&key=" + apiKey + "&date=" + startDate + "&enddate=" + endDate + "&tp=24&includelocation=yes&format=json");
+            String result = getRestTemplate().getForObject(this.historyUrl + "?q=" + lokacija.getCity() + ",ba&key=" + apiKey + "&date=" + startDate + "&enddate=" + endDate + "&tp=24&includelocation=yes&format=json", String.class);
 
             vracena = parsirajJSONObjectUListu(new JSONObject(result), brDana);
 
@@ -204,4 +188,28 @@ public class WorldWeatherOnlineWebService implements IWebService {
 
     }
 
+    @Override
+    public Prognoza getHistorijskePodatkeByLocationOnSpecificDate(Location lokacija, Calendar cal) throws ParseException {
+        
+        String a = lokacija.getCity();
+        //System.out.println("Ime grada: " + a);
+        
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.HOUR, 0);
+
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        ArrayList<Prognoza> vracena;
+
+        String date = df.format(cal.getTime());
+            
+        //System.out.println(this.historyUrl + "?q=" + lokacija.getCity() + ",ba&key=" + apiKey + "&date=" + date + "&enddate=" + date + "&tp=24&includelocation=yes&format=json");
+        String result = getRestTemplate().getForObject(this.historyUrl + "?q=" + lokacija.getCity() + ",ba&key=" + apiKey + "&date=" + date + "&enddate=" + date + "&tp=24&includelocation=yes&format=json", String.class);
+        
+        vracena = parsirajJSONObjectUListu(new JSONObject(result), 1);
+        
+        return vracena.get(0);
+
+    }
 }

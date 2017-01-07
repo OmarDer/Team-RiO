@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class Prognoza {
     
-    private String zaGrad;
+    private Grad zaGrad;
     private String temperatura;
     private String vlaznostZraka;
     private String pritisakZraka;
@@ -22,7 +22,7 @@ public class Prognoza {
     private String weatherIcon;
     private Date datum;
 
-    public Prognoza(String zaGrad, String temperatura, String vlaznostZraka, String pritisakZraka, String brzinaVjetra, String vrijeme) {
+    public Prognoza(Grad zaGrad, String temperatura, String vlaznostZraka, String pritisakZraka, String brzinaVjetra, String vrijeme) {
         this.zaGrad = zaGrad;
         this.temperatura = temperatura;
         this.vlaznostZraka = vlaznostZraka;
@@ -32,7 +32,7 @@ public class Prognoza {
         this.weatherIcon = setweatherIcon(vrijeme);
     }
 
-    public Prognoza(double temp, String vr, String city) {
+    public Prognoza(double temp, String vr, Grad city) {
         this.zaGrad = city;
         this.temperatura = String.valueOf(temp);
         this.vrijeme = vr;
@@ -48,11 +48,11 @@ public class Prognoza {
     }
     
     
-    public String getZaGrad() {
+    public Grad getZaGrad() {
         return zaGrad;
     }
 
-    public void setZaGrad(String zaGrad) {
+    public void setZaGrad(Grad zaGrad) {
         this.zaGrad = zaGrad;
     }
 

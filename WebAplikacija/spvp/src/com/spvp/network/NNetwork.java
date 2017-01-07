@@ -9,6 +9,8 @@ package com.spvp.network;
  *
  * @author User
  */
+import com.spvp.dal.Database;
+import com.spvp.dal.IDatabase;
 import org.encog.*;
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.neural.networks.training.propagation.quick.QuickPropagation;
@@ -25,6 +27,7 @@ import org.encog.neural.networks.training.propagation.resilient.ResilientPropaga
 import com.spvp.services.*;
 import com.spvp.model.*;
 import static java.lang.System.in;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
@@ -44,9 +47,9 @@ public class NNetwork {
         private double maxBv;
         private double minBv;
         private int velProblema;
-        private WebService ws;
+        private Database db;
 	
-	public NNetwork(IWebService webService){
+	public NNetwork(IDatabase iDB){
 		network = new BasicNetwork();
                 trError=0.0;
                 maxT=0.0;
@@ -55,7 +58,7 @@ public class NNetwork {
                 minV=0.0;
                 maxBv=0.0;
                 minBv=0.0;
-                ws = new WebService(webService);
+                db = new Database(iDB);
 	}
         
         private void formatirajUlaznePodatke(ArrayList<Prognoza>prognoze)
@@ -354,11 +357,11 @@ public class NNetwork {
            return ulaz;
        }
        
-        public ArrayList<Prognoza> weatherForecast(int brDana) throws ParseException 
+        public ArrayList<Prognoza> weatherForecast(int brDana) throws ParseException, SQLException 
         {
-                Location l=LocationService.getClientLocation();
+                Location l = LocationService.getClientLocation();
                 
-                ArrayList<Prognoza> prognoze = ws.getHistorijskePodatkeByLocation(l, brDana);
+                ArrayList<Prognoza> prognoze = db.dajHistorijskePodatkePrognozaZaGrad(l.getCity(), brDana);
                 
                 formatirajUlaznePodatke(prognoze);
                 formatirajIzlaznePodatke(prognoze);
@@ -443,7 +446,7 @@ public class NNetwork {
                         }
                     }
                     
-                    lista.add(new Prognoza(temp, vr, l.getCity()));
+                    lista.add(new Prognoza(temp, vr, l.getGrad()));
                     
                     
                 }
@@ -452,12 +455,11 @@ public class NNetwork {
                 
         }
         
-        public String weatherForecastByCityJSON(int brDana, String grad) throws ParseException 
+        public String weatherForecastByCityJSON(int brDana, String grad) throws ParseException, SQLException 
         {
-                Location l = LocationService.getClientLocation();
-                l.setCity(grad);
-                
-                ArrayList<Prognoza> prognoze=ws.getHistorijskePodatkeByLocation(l, brDana);
+                Location l = LocationService.getLocationByCityName(grad);
+
+                ArrayList<Prognoza> prognoze=db.dajHistorijskePodatkePrognozaZaGrad(l.getCity(), brDana);
                 
                 formatirajUlaznePodatke(prognoze);
                 formatirajIzlaznePodatke(prognoze);
@@ -542,7 +544,7 @@ public class NNetwork {
                         }
                     }
                     
-                    prognoze.add(new Prognoza(temp, vr, l.getCity()));
+                    prognoze.add(new Prognoza(temp, vr, l.getGrad()));
                     
                     
                 }

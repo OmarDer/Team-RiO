@@ -9,6 +9,7 @@ import com.spvp.model.Location;
 import com.spvp.model.Prognoza;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  *
@@ -35,6 +36,11 @@ public class WebService implements IWebService{
     @Override
     public Prognoza getWeatherByLocation(Location lokacija) {
         return webService.getWeatherByLocation(lokacija);
+    }
+
+    @Override
+    public Prognoza getHistorijskePodatkeByLocationOnSpecificDate(Location lokacija, Calendar cal) throws ParseException {
+        return webService.getHistorijskePodatkeByLocationOnSpecificDate(lokacija, cal);
     }
     
 }

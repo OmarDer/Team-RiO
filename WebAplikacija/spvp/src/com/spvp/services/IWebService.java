@@ -9,6 +9,7 @@ import com.spvp.model.Location;
 import com.spvp.model.Prognoza;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  *
@@ -21,5 +22,7 @@ public interface IWebService {
     Prognoza getWeatherByCityName(String city);
 
     Prognoza getWeatherByLocation(Location lokacija);
+    
+    Prognoza getHistorijskePodatkeByLocationOnSpecificDate(Location lokacija, Calendar cal) throws ParseException;
     
 }

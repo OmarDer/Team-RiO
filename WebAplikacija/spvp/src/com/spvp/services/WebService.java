@@ -42,5 +42,10 @@ public class WebService implements IWebService{
     public Prognoza getHistorijskePodatkeByLocationOnSpecificDate(Location lokacija, Calendar cal) throws ParseException {
         return webService.getHistorijskePodatkeByLocationOnSpecificDate(lokacija, cal);
     }
+
+    @Override
+    public String getWeatherByCityNameJSON(String city) {
+        return webService.getWeatherByCityNameJSON(city);
+    }
     
 }

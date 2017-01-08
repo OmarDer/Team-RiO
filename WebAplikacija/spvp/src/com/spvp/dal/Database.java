@@ -42,8 +42,8 @@ public class Database implements IDatabase{
     }
 
     @Override
-    public void osvjeziZadnjuPrognozuZaGrad(String imeGrada, WebService ws) throws SQLException, ParseException {
-        db.osvjeziZadnjuPrognozuZaGrad(imeGrada, ws);
+    public void osvjeziZadnjuPrognozuZaGrad(Grad grad, WebService ws) throws SQLException, ParseException {
+        db.osvjeziZadnjuPrognozuZaGrad(grad, ws);
     }
 
     @Override

@@ -56,7 +56,7 @@ public class URLRuter {
         
         @RequestMapping(value="/vrijemenarednidanibih", method = RequestMethod.GET)
 	public ModelAndView vrijemeUBiHNaredniDani(HttpServletRequest request) throws ParseException {
-            
+                
                 return new ModelAndView("vrijemenarednidanibih");
 	}
         
@@ -64,6 +64,11 @@ public class URLRuter {
 	public ModelAndView prognozaTriDana(@PathVariable("grad") String city, HttpServletRequest request) throws ParseException, SQLException {
             
                 return new ModelAndView("prognozatridana", "json", nn.weatherForecastByCityJSON(15, city));
+	}
+        
+        @RequestMapping(value="/trenutnovrijeme/{grad}", method = RequestMethod.GET)
+	public ModelAndView trenutnoVrijeme(@PathVariable("grad") String city, HttpServletRequest request) throws ParseException, SQLException {      
+                return new ModelAndView("trenutnovrijeme", "json", webService.getWeatherByCityNameJSON(city));
 	}
 
 }

@@ -459,7 +459,7 @@ public class NNetwork {
         {
                 Location l = LocationService.getLocationByCityName(grad);
 
-                ArrayList<Prognoza> prognoze=db.dajHistorijskePodatkePrognozaZaGrad(l.getCity(), brDana);
+                ArrayList<Prognoza> prognoze = db.dajHistorijskePodatkePrognozaZaGrad(l.getCity(), brDana);
                 
                 formatirajUlaznePodatke(prognoze);
                 formatirajIzlaznePodatke(prognoze);
@@ -493,18 +493,7 @@ public class NNetwork {
                 {
                     vrijeme[2][i]=rezultati3[i];
                 }
-                
-                //rezultati=nn.weatherForecast();
-                //for(int i=0;i<3;i++)
-                //{
-                //    for(int j=0;j<5;j++)
-                //    {
-                //       System.out.print(vrijeme[i][j]+" "); 
-                //    }
-                //    System.out.printf("%n");
-                //}
-                //return vrijeme;
-                
+
                 double temp = 0;
                 String vr = "";
                 
@@ -549,11 +538,15 @@ public class NNetwork {
                     
                 }
                 
-                String jsonString = "{";
+                String jsonString = "{ \"lokacija\":{ ";
+                jsonString += "\"grad\":\"" + prognoze.get(0).getZaGrad().getImeGrada() +"\", ";
+                jsonString += "\"latitude\":\"" + prognoze.get(0).getZaGrad().getLatitude() +"\", ";
+                jsonString += "\"longitude\":\"" + prognoze.get(0).getZaGrad().getLongitude() +"\"";
+                jsonString += " },\"izvjestajVrijeme\":{ ";
                 jsonString += "\"dan1\":{\"vrijeme\":\""+ prognoze.get(0).getVrijeme() + "\", \"temperatura\":\"" + prognoze.get(0).getTemperatura() + "\"},";
                 jsonString += "\"dan2\":{\"vrijeme\":\""+ prognoze.get(1).getVrijeme() + "\", \"temperatura\":\"" + prognoze.get(1).getTemperatura() + "\"},";
                 jsonString += "\"dan3\":{\"vrijeme\":\""+ prognoze.get(2).getVrijeme() + "\", \"temperatura\":\"" + prognoze.get(2).getTemperatura() + "\"}";
-                jsonString += "}";
+                jsonString += " } }";
                 
                 return jsonString;
                 

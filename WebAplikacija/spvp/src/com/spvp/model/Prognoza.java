@@ -5,6 +5,7 @@
  */
 package com.spvp.model;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -125,6 +126,15 @@ public class Prognoza {
             }
             else if(vr.contains("fog") || vr.contains("mist")){
                 return "resources/images/fog.jpg";
+            }
+            else if(vr.contains("clear")){
+                
+                Calendar cal = Calendar.getInstance();
+                
+                if(cal.get(Calendar.HOUR_OF_DAY) >= 18 || cal.get(Calendar.HOUR_OF_DAY) <=6)
+                    return "resources/images/clear_night.jpg";
+                else
+                    return "resources/images/sunny.jpg";
             }
             return "";
     }

@@ -7,8 +7,8 @@ var map;
 
 function getWeatherForCity(grad){
 
-	var weatherURL = "http://api.worldweatheronline.com/premium/v1/weather.ashx?q=" + grad + ",ba&key=67f8e93988414397bf2234724161212&fx=no&includelocation=yes&mca=no&format=json";
-
+    var weatherURL = "http://localhost:8084/spvp/trenutnovrijeme/" + grad;
+    
 	$.ajax({
 	  url: weatherURL,
 	  success: postaviMarkerNaMapu,
@@ -149,7 +149,13 @@ function postaviIkonu(vrijeme){
         return "resources/images/fog_icon.jpg";
     }
     else if(vrijeme.indexOf('clear') !== -1){
-        return "resources/images/clear_icon.jpg";
+
+        var date = new Date();
+        if(date.getHours() >= 18 || date.getHours() <= 6)
+            return "resources/images/clear_night_icon.jpg";
+        else
+            return "resources/images/clear_icon.jpg";
+
     }
     return "";
 }

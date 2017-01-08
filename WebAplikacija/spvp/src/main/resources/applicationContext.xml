@@ -13,9 +13,9 @@
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
             
 		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://localhost:3306/weather_forecasting?serverTimezone=CET" />
-		<property name="username" value="root" />
-		<property name="password" value="" />
+		<property name="url" value="jdbc:mysql://192.168.1.50:3306/weather_forecasting?serverTimezone=CET" />
+		<property name="username" value="rsmajic" />
+		<property name="password" value="ragib" />
 	</bean>
         
         <bean id="webService" class="com.spvp.services.WorldWeatherOnlineWebService">

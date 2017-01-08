@@ -24,65 +24,57 @@ function postaviMarkerNaMapu(grad, data, status, jqXHR){
 		var x = JSON.stringify(data);
 		var obj = jQuery.parseJSON(x);
 		
-		var vrijeme = obj.dan1.vrijeme;
+		var vrijeme = obj.izvjestajVrijeme.dan1.vrijeme;
 		var dani = dajDanePrekosutra();
 
 		var vrijemeDan1 = 	"<p><strong>Sutra</strong></p>" + 
-							"<img src='" + postaviIkonu(obj.dan1.vrijeme) + "' />" +
-						  	"<p><strong>Vrijeme: </strong>" + obj.dan1.vrijeme + "</p>" + 
-						  	"<p><strong>Temperatura: </strong>" + obj.dan1.temperatura + "&deg;C</p>";
+							"<img src='" + postaviIkonu(obj.izvjestajVrijeme.dan1.vrijeme) + "' />" +
+						  	"<p><strong>Vrijeme: </strong>" + obj.izvjestajVrijeme.dan1.vrijeme + "</p>" + 
+						  	"<p><strong>Temperatura: </strong>" + obj.izvjestajVrijeme.dan1.temperatura + "&deg;C</p>";
 
 		var vrijemeDan2 = 	"<p><strong>"+dani[0]+"</strong></p>" +
-							"<img src='" + postaviIkonu(obj.dan2.vrijeme) + "' />" +
-							"<p><strong>Vrijeme: </strong>" + obj.dan2.vrijeme + "</p>" + 
-						  	"<p><strong>Temperatura: </strong>" + obj.dan2.temperatura + "&deg;C</p>";
+							"<img src='" + postaviIkonu(obj.izvjestajVrijeme.dan2.vrijeme) + "' />" +
+							"<p><strong>Vrijeme: </strong>" + obj.izvjestajVrijeme.dan2.vrijeme + "</p>" + 
+						  	"<p><strong>Temperatura: </strong>" + obj.izvjestajVrijeme.dan2.temperatura + "&deg;C</p>";
 
 		var vrijemeDan3 = 	"<p><strong>"+dani[1]+"</strong></p>" +
-							"<img src='" + postaviIkonu(obj.dan3.vrijeme) + "' />" +
-							"<p><strong>Vrijeme: </strong>" + obj.dan3.vrijeme + "</p>" + 
-						  	"<p><strong>Temperatura: </strong>" + obj.dan3.temperatura + "&deg;C</p>";
+							"<img src='" + postaviIkonu(obj.izvjestajVrijeme.dan3.vrijeme) + "' />" +
+							"<p><strong>Vrijeme: </strong>" + obj.izvjestajVrijeme.dan3.vrijeme + "</p>" + 
+						  	"<p><strong>Temperatura: </strong>" + obj.izvjestajVrijeme.dan3.temperatura + "&deg;C</p>";
 
 		var latitude = 0;
 		var longitude = 0;
 		var zaGrad;
 
-		$.ajax({url: "http://maps.google.com/maps/api/geocode/json?address=" + grad + "&sensor=false&region=ba", success: function(coordinates){
-        	
-        	latitude = coordinates.results[0].geometry.location.lat;
-            longitude = coordinates.results[0].geometry.location.lng;
-            zaGrad = coordinates.results[0].address_components[0].long_name;
+        var lat = parseFloat(obj.lokacija.latitude)
+		var lon = parseFloat(obj.lokacija.longitude)
 
-            var lat = parseFloat(latitude)
-			var lon = parseFloat(longitude)
+		var lokacija = {lat: lat, lng: lon};
 
-			var lokacija = {lat: lat, lng: lon};
+        var contentString = "<div class='row'>" +
+        					"<div class='col-lg-4'>" + vrijemeDan1 + "</div>" +
+        					"<div class='col-lg-4'>" + vrijemeDan2 + "</div>" +
+        					"<div class='col-lg-4'>" + vrijemeDan3 + "</div>" +
+        					"</div>";		
 
-	        var contentString = "<div class='row'>" +
-	        					"<div class='col-lg-4'>" + vrijemeDan1 + "</div>" +
-	        					"<div class='col-lg-4'>" + vrijemeDan2 + "</div>" +
-	        					"<div class='col-lg-4'>" + vrijemeDan3 + "</div>" +
-	        					"</div>";		
+        var infowindow = new google.maps.InfoWindow({
+          content: contentString
+        });
 
-	        var infowindow = new google.maps.InfoWindow({
-	          content: contentString
-	        });
+        var marker = new google.maps.Marker({
+          position: lokacija,
+          map: map,
+          icon: postaviIkonu(vrijeme),
+          title: 'Vrijeme za ' + zaGrad + ', Bosna i Hercegovina'
+        });
 
-	        var marker = new google.maps.Marker({
-	          position: lokacija,
-	          map: map,
-	          icon: postaviIkonu(vrijeme),
-	          title: 'Vrijeme za ' + zaGrad + ', Bosna i Hercegovina'
-	        });
+        marker.addListener('mouseover', function() {
+          infowindow.open(map, marker);
+        });
 
-	        marker.addListener('mouseover', function() {
-	          infowindow.open(map, marker);
-	        });
-
-	        marker.addListener('mouseout', function() {
-	          infowindow.close();
-	        });
-
-    	}});
+        marker.addListener('mouseout', function() {
+          infowindow.close();
+        });
 
 	}
 	else{

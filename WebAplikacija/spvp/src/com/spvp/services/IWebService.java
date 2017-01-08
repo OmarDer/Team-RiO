@@ -25,4 +25,5 @@ public interface IWebService {
     
     Prognoza getHistorijskePodatkeByLocationOnSpecificDate(Location lokacija, Calendar cal) throws ParseException;
     
+    String getWeatherByCityNameJSON(String city);
 }

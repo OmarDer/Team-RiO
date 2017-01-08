@@ -24,7 +24,7 @@ public interface IDatabase {
 
     void osvjeziHistorijuPrognoza(WebService ws) throws SQLException, ParseException;
 
-    void osvjeziZadnjuPrognozuZaGrad(String imeGrada, WebService ws) throws SQLException, ParseException;
+    void osvjeziZadnjuPrognozuZaGrad(Grad grad, WebService ws) throws SQLException, ParseException;
 
     Boolean ucitajGradoveUBazu(ArrayList<Grad> gradovi) throws SQLException;
 

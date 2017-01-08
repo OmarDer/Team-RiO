@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -161,6 +162,8 @@ public class MySqlDatabase implements IDatabase {
         
         } catch (SQLException ex) {
             Logger.getLogger(MySqlDatabase.class.getName()).log(Level.SEVERE, null, ex);
+             if(conn != null)
+                conn.rollback();
            
         }finally{
         
@@ -174,26 +177,32 @@ public class MySqlDatabase implements IDatabase {
     @Override
     public Grad dajGradPoImenu(String imeGrada) throws SQLException{
         
+        int id;
         String ime;
         Double longitude;
         Double latitude;
         Boolean veciCentar;
         try (Connection conn = getConnection()) {
+
+            PreparedStatement ps = conn.prepareStatement("SELECT id, ime, longitude, latitude, veci_centar " +
+                                                            "FROM gradovi " +
+                                                            "WHERE LOWER(ime) LIKE LOWER(?) ");
             
-            PreparedStatement ps = conn.prepareStatement("SELECT ime, longitude, latitude, veci_centar "
-                    + "FROM gradovi "
-                    + "WHERE ime=?");
             ps.setString(1, imeGrada);
+            
             ResultSet rs = ps.executeQuery();
             rs.next();
+            id = rs.getInt("id");
             ime = rs.getString("ime");
             longitude = rs.getDouble("longitude");
             latitude = rs.getDouble("latitude");
             veciCentar = rs.getBoolean("veci_centar");
         }
         
-        return new Grad(ime, longitude, latitude, veciCentar);
+        Grad g = new Grad(ime, longitude, latitude, veciCentar);
+        g.setIdGrada(id);
         
+        return g;
     }
     
     private int dajIdGradaPoImenu(String imeGrada) throws SQLException{
@@ -219,13 +228,12 @@ public class MySqlDatabase implements IDatabase {
     public ArrayList<Prognoza> dajHistorijskePodatkePrognozaZaGrad(String grad, int brojDana) throws SQLException{
         
         Grad x = this.dajGradPoImenu(grad);
-        x.setIdGrada(this.dajIdGradaPoImenu(grad));
-        
+
         this.osvjeziHistorijuPrognozaZaGrad(x, webService);
         
         ArrayList<Prognoza> listaPrognoza = new ArrayList<>();
         
-        int idGrada = dajIdGradaPoImenu(grad);
+        int idGrada = x.getIdGrada();
         
         if(idGrada == -1) return listaPrognoza;
         
@@ -251,6 +259,10 @@ public class MySqlDatabase implements IDatabase {
                 listaPrognoza.add(p);
                 
             }
+            
+            conn.close();
+            s.close();
+            rs.close();
         }
         
         return listaPrognoza;
@@ -301,7 +313,7 @@ public class MySqlDatabase implements IDatabase {
                   
                   //System.out.println("Osvjezavanje zadnjeg dana u bazi...");
                   
-                  this.osvjeziZadnjuPrognozuZaGrad(g.getImeGrada(), ws);
+                  this.osvjeziZadnjuPrognozuZaGrad(g, ws);
                   
                   //System.out.println("Ucitavanje novih prognoza...");
                   
@@ -358,7 +370,8 @@ public class MySqlDatabase implements IDatabase {
                   this.osvjeziHistorijuPrognozaZaGrad(x, ws);
               }
             
-            
+              rs.close();
+              s.close();
         } catch (SQLException ex) {
             Logger.getLogger(MySqlDatabase.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -369,6 +382,13 @@ public class MySqlDatabase implements IDatabase {
     public static void main(String[] args) throws SQLException, ParseException{
          
         //MySqlDatabase db = new MySqlDatabase();
+        
+        //BasicDataSource ds = new BasicDataSource();
+        //ds.setUrl("jdbc:mysql://192.168.1.50:3306/weather_forecasting?serverTimezone=CET");
+        //ds.setUsername("rsmajic");
+        //ds.setPassword("ragib");
+        
+        //db.setDataSource(ds);
         //WebService ws = new WebService(new WorldWeatherOnlineWebService());
         //Grad g = LocationService.getLocationByCityName("Mostar").getGrad();
         //g.setIdGrada(db.dajIdGradaPoImenu("Sarajevo"));
@@ -378,14 +398,15 @@ public class MySqlDatabase implements IDatabase {
         //for(int i = 0; i < 500; i++)
         //System.out.println(db.dajIdGradaPoImenu("Sarajevo"));
         //db.ucitajGradoveUBazu(db.dajVeceCentre());
+        //db.ucitajGradoveUBazu(db.dajManjeCentre());
         //db.ucitajPrognozeUBazu(db.dajPrognozeZaVeceCentre());      
         
     }
     
     @Override
-    public void osvjeziZadnjuPrognozuZaGrad(String imeGrada, WebService ws) throws SQLException, ParseException{
+    public void osvjeziZadnjuPrognozuZaGrad(Grad grad, WebService ws) throws SQLException, ParseException{
         
-        int id = this.dajIdGradaPoImenu(imeGrada);
+        int id = grad.getIdGrada();
         
         try(Connection conn = getConnection()){
         
@@ -412,7 +433,14 @@ public class MySqlDatabase implements IDatabase {
             else
                 return;
             
-            Location l = LocationService.getLocationByCityName(imeGrada);
+            Location l = new Location(true);
+            l.setCity(grad.getImeGrada());
+            l.setCountry("Bosnia");
+            l.setCountryCode("ba");
+            l.setLatitude(grad.getLatitude());
+            l.setLongitude(grad.getLongitude());
+            
+            //System.out.println(l.getCity());
             
             Prognoza prognoza = ws.getHistorijskePodatkeByLocationOnSpecificDate(l, cal);
             
@@ -435,6 +463,8 @@ public class MySqlDatabase implements IDatabase {
             
             
             ps.close();
+            conn.close();
+            rs.close();
 
         }
     }
@@ -457,9 +487,97 @@ public class MySqlDatabase implements IDatabase {
         g = LocationService.getLocationByCityName("Banja Luka").getGrad();
         g.setVeciCentar(Boolean.TRUE);
         gradovi.add(g);
+        g = LocationService.getLocationByCityName("Bihac").getGrad();
+        g.setVeciCentar(Boolean.TRUE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Trebinje").getGrad();
+        g.setVeciCentar(Boolean.TRUE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Visegrad").getGrad();
+        g.setVeciCentar(Boolean.TRUE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Doboj").getGrad();
+        g.setVeciCentar(Boolean.TRUE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Bugojno").getGrad();
+        g.setVeciCentar(Boolean.TRUE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Livno").getGrad();
+        g.setVeciCentar(Boolean.TRUE);
+        gradovi.add(g);
         
         return gradovi;
     
+    }
+    
+    private ArrayList<Grad> dajManjeCentre(){
+        
+        ArrayList<Grad> gradovi = new ArrayList<>();
+        Grad g = LocationService.getLocationByCityName("Sanski Most").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Travnik").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Konjic").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Neum").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Jablanica").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Mrkonjic Grad").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Drvar").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Gradacac").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Bijeljina").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Gorazde").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Foca").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Stolac").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Ljubinje").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Derventa").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Gradiska").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Kakanj").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Vlasenica").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Visoko").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Fojnica").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Srebrenica").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        g = LocationService.getLocationByCityName("Velika Kladusa").getGrad();
+        g.setVeciCentar(Boolean.FALSE);
+        gradovi.add(g);
+        return gradovi;
+        
     }
     
     private ArrayList<Prognoza> dajPrognozeZaVeceCentre() throws ParseException{

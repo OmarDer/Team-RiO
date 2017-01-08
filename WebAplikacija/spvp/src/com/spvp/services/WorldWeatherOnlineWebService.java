@@ -1,5 +1,6 @@
 package com.spvp.services;
 
+import com.spvp.model.Grad;
 import com.spvp.model.Location;
 import com.spvp.model.Prognoza;
 import java.text.DateFormat;
@@ -35,10 +36,12 @@ public class WorldWeatherOnlineWebService implements IWebService {
     public WorldWeatherOnlineWebService() {
         this.basicUrl = "http://api.worldweatheronline.com/premium/v1/weather.ashx";
         this.historyUrl = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx";
-        this.apiKey = "67f8e93988414397bf2234724161212";
+        //this.apiKey = "67f8e93988414397bf2234724161212";
+        this.apiKey = "45f49575a5cb4ea78db234736170701";
     }
 
     private Prognoza parsirajJSONObject(JSONObject json) {
+        
         JSONObject podaci = json.getJSONObject("data");
         JSONObject nearestArea = podaci.getJSONArray("nearest_area").getJSONObject(0);
         JSONObject trenutnoStanje = podaci.getJSONArray("current_condition").getJSONObject(0);
@@ -72,7 +75,9 @@ public class WorldWeatherOnlineWebService implements IWebService {
         String brzinaVjetra;
         String vrijeme;
         Date datum;
-
+        
+        Grad g = LocationService.getLocationByCityName(gradName).getGrad();
+        
         Prognoza prog;
 
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
@@ -94,7 +99,7 @@ public class WorldWeatherOnlineWebService implements IWebService {
             brzinaVjetra = vrijemeZaDan.getString("windspeedKmph");
             vrijeme = vrijemeZaDan.getJSONArray("weatherDesc").getJSONObject(0).getString("value");
 
-            prog = new Prognoza(LocationService.getLocationByCityName(gradName).getGrad(), temp, vlaznostZraka, pritisak, brzinaVjetra, vrijeme);
+            prog = new Prognoza(g, temp, vlaznostZraka, pritisak, brzinaVjetra, vrijeme);
 
             prog.setDatum(datum);
 
@@ -108,6 +113,12 @@ public class WorldWeatherOnlineWebService implements IWebService {
     public Prognoza getWeatherByCityName(String city) {
         String result = getRestTemplate().getForObject(this.basicUrl + "?q=" + city + ",ba&key=" + apiKey + "&fx=no&includelocation=yes&mca=no&format=json", String.class);
         return parsirajJSONObject(new JSONObject(result));
+    }
+    
+    @Override
+    public String getWeatherByCityNameJSON(String city) {
+        String result = getRestTemplate().getForObject(this.basicUrl + "?q=" + city + ",ba&key=" + apiKey + "&fx=no&includelocation=yes&mca=no&format=json", String.class);
+        return result;
     }
 
     @Override
@@ -176,7 +187,7 @@ public class WorldWeatherOnlineWebService implements IWebService {
             long diff = krajnjiDatumi.get(i).getTime() - pocetniDatumi.get(i).getTime();
             long brDana = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 
-            //System.out.println(this.historyUrl + "?q=" + lokacija.getCity() + ",ba&key=" + apiKey + "&date=" + startDate + "&enddate=" + endDate + "&tp=24&includelocation=yes&format=json");
+            System.out.println(this.historyUrl + "?q=" + lokacija.getCity() + ",ba&key=" + apiKey + "&date=" + startDate + "&enddate=" + endDate + "&tp=24&includelocation=yes&format=json");
             String result = getRestTemplate().getForObject(this.historyUrl + "?q=" + lokacija.getCity() + ",ba&key=" + apiKey + "&date=" + startDate + "&enddate=" + endDate + "&tp=24&includelocation=yes&format=json", String.class);
 
             vracena = parsirajJSONObjectUListu(new JSONObject(result), brDana);
@@ -204,7 +215,7 @@ public class WorldWeatherOnlineWebService implements IWebService {
 
         String date = df.format(cal.getTime());
             
-        //System.out.println(this.historyUrl + "?q=" + lokacija.getCity() + ",ba&key=" + apiKey + "&date=" + date + "&enddate=" + date + "&tp=24&includelocation=yes&format=json");
+        System.out.println(this.historyUrl + "?q=" + lokacija.getCity() + ",ba&key=" + apiKey + "&date=" + date + "&enddate=" + date + "&tp=24&includelocation=yes&format=json");
         String result = getRestTemplate().getForObject(this.historyUrl + "?q=" + lokacija.getCity() + ",ba&key=" + apiKey + "&date=" + date + "&enddate=" + date + "&tp=24&includelocation=yes&format=json", String.class);
         
         vracena = parsirajJSONObjectUListu(new JSONObject(result), 1);
